@@ -8,47 +8,23 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="Offers")
-public class Offers {
+@Table(name="CounterOffer")
+public class CounterOffer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name ="id")
-	private long offerId;
+	private long counterOfferId;
 	
 	@Column(name= "SourceCountry", nullable = false)
 	private String sourceCountry;
 	
-	@Column(name= "SourceCurrency", nullable = false)
-	private String sourceCurrency;
-	
-	@Column(name= "Amount", nullable = false)
-	private double amount;
-	
-	@Column(name= "DestinationCountry", nullable = false)
-	private String destinationCountry;
-	
-	@Column(name= "DestinationCurrency", nullable = false)
-	private String destinationCurrency;
-	
-	@Column(name= "ExchangeRate", nullable = false)
-	private double exchangeRate;
-	
-	@Column(name= "ExpirationDate", nullable = false)
-	private String expirationDate;
-	
-	@Column(name= "hasCounterOffer", nullable = false)
-	private boolean hasCounterOffer;
-	
-	@Column(name= "hasSplitOffer", nullable = false)
-	private boolean hasSplitOffer;
-
-	public long getOfferId() {
-		return offerId;
+	public long getCounterOfferId() {
+		return counterOfferId;
 	}
 
-	public void setOfferId(long offerId) {
-		this.offerId = offerId;
+	public void setCounterOfferId(long counterOfferId) {
+		this.counterOfferId = counterOfferId;
 	}
 
 	public String getSourceCountry() {
@@ -107,21 +83,23 @@ public class Offers {
 		this.expirationDate = expirationDate;
 	}
 
-	public boolean isHasCounterOffer() {
-		return hasCounterOffer;
-	}
-
-	public void setHasCounterOffer(boolean hasCounterOffer) {
-		this.hasCounterOffer = hasCounterOffer;
-	}
-
-	public boolean getHasSplitOffer() {
-		return hasSplitOffer;
-	}
-
-	public void setHasSplitOffer(boolean hasSplitOffer) {
-		this.hasSplitOffer = hasSplitOffer;
-	}
+	@Column(name= "SourceCurrency", nullable = false)
+	private String sourceCurrency;
+	
+	@Column(name= "Amount", nullable = false)
+	private double amount;
+	
+	@Column(name= "DestinationCountry", nullable = false)
+	private String destinationCountry;
+	
+	@Column(name= "DestinationCurrency", nullable = false)
+	private String destinationCurrency;
+	
+	@Column(name= "ExchangeRate", nullable = false)
+	private double exchangeRate;
+	
+	@Column(name= "ExpirationDate", nullable = false)
+	private String expirationDate;
 	
 	
 }
