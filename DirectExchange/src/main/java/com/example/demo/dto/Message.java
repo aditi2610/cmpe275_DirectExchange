@@ -2,10 +2,15 @@ package com.example.demo.dto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "message")
@@ -16,8 +21,14 @@ public class Message {
 	@Column(name ="id")
 	private long id;
 	
+	@ManyToOne( fetch = FetchType.LAZY)
+	@JoinColumn(name = "sender", referencedColumnName = "id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User sender;
 	
+	@ManyToOne( fetch = FetchType.LAZY)
+	@JoinColumn(name = "receiver", referencedColumnName = "id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User receiver;
 	
 	@Column(name="message")

@@ -2,13 +2,19 @@ package com.example.demo.dto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author shahh
@@ -23,9 +29,41 @@ public class Transactions {
 	@Column(name ="id")
 	private long id;
 	
-	private Offers offer1;
+	@ManyToOne( fetch = FetchType.LAZY)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private User user1;
+
+	@ManyToOne( fetch = FetchType.LAZY)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private User user2;
+
+	@OneToOne
+	@JoinColumn(name="offer", referencedColumnName ="id")
+	private Offer offer;
 	
-	private Offers offer2;
+	public User getUser1() {
+		return user1;
+	}
+
+	public void setUser1(User user1) {
+		this.user1 = user1;
+	}
+
+	public User getUser2() {
+		return user2;
+	}
+
+	public void setUser2(User user2) {
+		this.user2 = user2;
+	}
+
+	public Offer getOffer() {
+		return offer;
+	}
+
+	public void setOffer(Offer offer) {
+		this.offer = offer;
+	}
 
 	public long getId() {
 		return id;
@@ -34,23 +72,6 @@ public class Transactions {
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	public Offers getOffer1() {
-		return offer1;
-	}
-
-	public void setOffer1(Offers offer1) {
-		this.offer1 = offer1;
-	}
-
-	public Offers getOffer2() {
-		return offer2;
-	}
-
-	public void setOffer2(Offers offer2) {
-		this.offer2 = offer2;
-	}
-	
 
 	@Override
     public int hashCode() {
