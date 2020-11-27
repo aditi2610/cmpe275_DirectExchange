@@ -16,6 +16,9 @@ function Header(props) {
         <Nav.Item>
           <Nav.Link><Link to='/browse-offers'>Browse Offers</Link></Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link><Link to='/my-offers'>My Offers</Link></Nav.Link>
+        </Nav.Item>
       </Nav>
       <Navbar.Brand href='/home'><img className = 'logo' src = {logo} alt ="Home Finder" ></img></Navbar.Brand>
         <Nav className="ml-auto" activeKey="/home">
