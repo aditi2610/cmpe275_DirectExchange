@@ -13,6 +13,12 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+property = "id")
 @Entity
 @Table(name="User")
 public class User {
@@ -116,7 +122,7 @@ public class User {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	@JsonIgnoreProperties({"accounts"})
 	public Set<BankAccount> getAccounts() {
 		return accounts;
 	}

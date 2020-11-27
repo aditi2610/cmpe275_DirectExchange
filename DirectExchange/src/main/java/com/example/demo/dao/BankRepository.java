@@ -1,5 +1,10 @@
 package com.example.demo.dao;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface BankRepository {
+import com.example.demo.dto.BankAccount;
+
+@Repository
+public interface BankRepository extends JpaRepository<BankAccount, Long> {
 
 }

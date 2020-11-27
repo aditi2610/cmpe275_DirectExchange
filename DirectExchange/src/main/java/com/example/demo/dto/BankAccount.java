@@ -13,8 +13,12 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+property = "id")
 @Entity
 @Table(name="BankAccount")
 public class BankAccount {
@@ -48,9 +52,24 @@ public class BankAccount {
 
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "accounts", referencedColumnName = "id")
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
+	public BankAccount(String bankName, String country, String accountNumber, String ownerName,
+			String ownerAddress, String primaryCurrency, int supportMethod, User user) {
+		// TODO Auto-generated constructor stub
+		this.bankName=bankName;
+		this.country=country;
+		this.accountNumber=accountNumber;
+		this.ownerName=ownerName;
+		this.ownerAddress=ownerAddress;
+		this.primaryCurrency=primaryCurrency;
+		this.supportMethod=supportMethod;
+		this.user=user;
+		
+		
+	}
+
 	public long getBankId() {
 		return id;
 	}
@@ -122,7 +141,7 @@ public class BankAccount {
 	public void setId(long id) {
 		this.id = id;
 	}
-
+	@JsonIgnoreProperties({"accounts"})
 	public User getUser() {
 		return user;
 	}
