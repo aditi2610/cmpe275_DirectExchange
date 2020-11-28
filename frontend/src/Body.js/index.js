@@ -6,6 +6,7 @@ import MyOffers from './MyOffers';
 import PostNewOffer from './PostNewOffer';
 import SignIn from './SignIn';
 import SignOut from './SignOut';
+import AddBankAccount from './AddBankAccount';
 
 function Body(props) {
   return (
@@ -16,6 +17,7 @@ function Body(props) {
       <Route exact path="/sign-in" component={SignIn} />
       <Route exact path="/sign-out" component={SignOut} />
       <Route exact path="/post-offer" component={PostNewOffer} />
+      <Route exact path="/addBank" component={AddBankAccount} />
     </Switch>
   );
 }
