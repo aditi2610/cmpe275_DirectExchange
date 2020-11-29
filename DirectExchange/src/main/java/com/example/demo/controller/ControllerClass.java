@@ -2,16 +2,17 @@ package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.example.demo.service.IBankAccountService;
 
 
-
+//@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+@CrossOrigin
 @RestController
 public class ControllerClass {
 
@@ -28,7 +29,7 @@ public ResponseEntity<?> addBankAccount(
 		@RequestParam(value="ownerName",required=false) String ownerName,
 		@RequestParam(value="ownerAddress",required=false) String ownerAddress,
 		@RequestParam(value="primaryCurrency",required=false) String primaryCurrency,
-		@RequestParam(value="supportMethod",required=false) Integer supportMethod,
+		@RequestParam(value="supportMethod",required=false) String supportMethod,
 		@RequestParam(value="userId",required=false) Long userId
 		
 		) 
@@ -36,7 +37,7 @@ public ResponseEntity<?> addBankAccount(
 
 	ResponseEntity<?> res = null;
 	try {
-
+System.out.println(bankName+" "+"country "+country+accountNumber+ownerName+ownerAddress+primaryCurrency+supportMethod+userId);
 		res = BankAccountService.addBankAccount(bankName, country, accountNumber, ownerName, ownerAddress,  primaryCurrency,supportMethod, userId);
 	} catch (Exception e) {
 		e.printStackTrace();

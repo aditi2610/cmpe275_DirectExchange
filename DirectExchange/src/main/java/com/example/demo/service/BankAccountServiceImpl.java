@@ -24,7 +24,7 @@ public class BankAccountServiceImpl implements IBankAccountService {
 	
 	@Override
 	public ResponseEntity<?> addBankAccount(String bankName, String country, String accountNumber, String ownerName,
-			String ownerAddress, String primaryCurrency, int supportMethod, Long userId) {
+			String ownerAddress, String primaryCurrency, String supportMethod, Long userId) {
 		// TODO Auto-generated method stub
 		User bankUser=null;
 			Optional<User> user = userRepository.findById(userId);

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IBankAccountService {
 	
-		ResponseEntity<?> addBankAccount(String bankName, String country,String accountNumber,String ownerName, String ownerAddress, String primaryCurrency, int supportMethod,Long userId); 
+		ResponseEntity<?> addBankAccount(String bankName, String country,String accountNumber,String ownerName, String ownerAddress, String primaryCurrency, String supportMethod,Long userId); 
 
 		ResponseEntity<?> getBankAccount(Long id); 
 

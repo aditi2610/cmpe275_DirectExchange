@@ -46,9 +46,9 @@ public class BankAccount {
 	@Column(name= "PrimaryCurrency", nullable = false)
 	private String primaryCurrency;
 	
-	// Send = 1, Receive = 2 , Both = 0
+	// Send , Receive  , Both 
 	@Column(name= "SupportMethod", nullable = false)
-	private int supportMethod;
+	private String supportMethod;
 
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "accounts", referencedColumnName = "id")
@@ -56,7 +56,7 @@ public class BankAccount {
 	private User user;
 	
 	public BankAccount(String bankName, String country, String accountNumber, String ownerName,
-			String ownerAddress, String primaryCurrency, int supportMethod, User user) {
+			String ownerAddress, String primaryCurrency, String supportMethod, User user) {
 		// TODO Auto-generated constructor stub
 		this.bankName=bankName;
 		this.country=country;
@@ -118,11 +118,11 @@ public class BankAccount {
 		this.ownerAddress = ownerAddress;
 	}
 
-	public int getSupportMethod() {
+	public String getSupportMethod() {
 		return supportMethod;
 	}
 
-	public void setSupportMethod(int supportMethod) {
+	public void setSupportMethod(String supportMethod) {
 		this.supportMethod = supportMethod;
 	}
 
