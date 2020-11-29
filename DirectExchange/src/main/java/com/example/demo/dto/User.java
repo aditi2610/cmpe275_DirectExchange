@@ -53,11 +53,11 @@ public class User {
 	private Set<Message> receiverMsg; 
 	
 	
-	@OneToMany(mappedBy = "user1")
-	private Set<Transactions> user1Transections; 
+	@OneToMany(mappedBy = "sender")
+	private Set<Transactions> senderTransections; 
 	
-	@OneToMany(mappedBy = "user2")
-	private Set<Transactions> user2Transections; 
+	@OneToMany(mappedBy = "receiver")
+	private Set<Transactions> receiverTransections; 
 	
 	public Set<Offer> getOffers() {
 		return offers;

@@ -8,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -31,30 +30,47 @@ public class Transactions {
 	
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private User user1;
+	private User sender;
 
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private User user2;
+	private User receiver;
 
-	@OneToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="offer", referencedColumnName ="id")
 	private Offer offer;
 	
-	public User getUser1() {
-		return user1;
+	@Column(name="sendingAmount")
+	private double sendingAmount;
+
+	@Column(name="recevingAmount")
+	private double recevingAmount;
+	
+	@Column(name="sourceCurrency")
+	private String sourceCurrency;
+	
+	@Column(name="destinationCurrency")
+	private String destinationCurrency;
+	
+	//0 for inProgress, 1 successful
+	@Column(name="status")
+	private boolean status;
+	
+	
+	public User getSender() {
+		return sender;
 	}
 
-	public void setUser1(User user1) {
-		this.user1 = user1;
+	public void setSender(User sender) {
+		this.sender = sender;
 	}
 
-	public User getUser2() {
-		return user2;
+	public User getReceiver() {
+		return receiver;
 	}
 
-	public void setUser2(User user2) {
-		this.user2 = user2;
+	public void setReceiver(User receiver) {
+		this.receiver = receiver;
 	}
 
 	public Offer getOffer() {
@@ -71,6 +87,46 @@ public class Transactions {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public double getSendingAmount() {
+		return sendingAmount;
+	}
+
+	public void setSendingAmount(double sendingAmount) {
+		this.sendingAmount = sendingAmount;
+	}
+
+	public double getRecevingAmount() {
+		return recevingAmount;
+	}
+
+	public void setRecevingAmount(double recevingAmount) {
+		this.recevingAmount = recevingAmount;
+	}
+
+	public String getSourceCurrency() {
+		return sourceCurrency;
+	}
+
+	public void setSourceCurrency(String sourceCurrency) {
+		this.sourceCurrency = sourceCurrency;
+	}
+
+	public String getDestinationCurrency() {
+		return destinationCurrency;
+	}
+
+	public void setDestinationCurrency(String destinationCurrency) {
+		this.destinationCurrency = destinationCurrency;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
 	}
 
 	@Override

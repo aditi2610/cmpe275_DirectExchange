@@ -1,8 +1,8 @@
 package com.example.demo.dto;
 
 import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,7 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -60,16 +60,26 @@ public class Offer {
 	@Column(name= "isSplitOfferAllowed", nullable = false)
 	private boolean isSplitOfferAllowed;
 
-	@Column(name="status")
+	//0 for inActive, 1 for Active , 2 for inProcess , 3 - for Fulfilled
+	@Column(name="status", columnDefinition = "integer default 1")
 	private int status;
 	
+//	@ManyToOne
+//	private Offer parentOffer;
+//	
+    @ManyToOne
+    private Offer parentOffer;
+    
+    @Column(name="isCounterOffer")
+    private boolean isCounterOffer;
+    
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "user", referencedColumnName = "id")
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "offer")
-	private Transactions transaction;
+	@OneToMany(mappedBy = "offer")
+	private Set<Transactions> transaction;
 	
 	public long getOfferId() {
 		return id;
@@ -183,12 +193,28 @@ public class Offer {
 		this.isSplitOfferAllowed = isSplitOfferAllowed;
 	}
 
-	public Transactions getTransaction() {
+	public Set<Transactions> getTransaction() {
 		return transaction;
 	}
 
-	public void setTransaction(Transactions transaction) {
+	public void setTransaction(Set<Transactions> transaction) {
 		this.transaction = transaction;
+	}
+
+	public Offer getParentOffer() {
+		return parentOffer;
+	}
+
+	public void setParentOffer(Offer parentOffer) {
+		this.parentOffer = parentOffer;
+	}
+
+	public boolean isCounterOffer() {
+		return isCounterOffer;
+	}
+
+	public void setCounterOffer(boolean isCounterOffer) {
+		this.isCounterOffer = isCounterOffer;
 	}
 
 	@Override
