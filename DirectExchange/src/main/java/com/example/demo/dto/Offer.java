@@ -20,6 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name="Offer")
@@ -51,12 +52,15 @@ public class Offer {
 	@Column(name= "ExpirationDate", nullable = false)
 	private Date expirationDate;
 	
-	@Temporal(TemporalType.TIMESTAMP)
+	//@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="creationDate", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private Date creationDate;
 	
+	@JsonProperty
 	@Column(name= "isCounterOfferAllowed", nullable = false)
 	private boolean isCounterOfferAllowed;
 	
+	@JsonProperty
 	@Column(name= "isSplitOfferAllowed", nullable = false)
 	private boolean isSplitOfferAllowed;
 

@@ -32,9 +32,9 @@ public class Transactions {
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User sender;
 
-	@ManyToOne( fetch = FetchType.LAZY)
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private User receiver;
+//	@ManyToOne( fetch = FetchType.LAZY)
+//	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//	private User receiver;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="offer", referencedColumnName ="id")
@@ -65,13 +65,13 @@ public class Transactions {
 		this.sender = sender;
 	}
 
-	public User getReceiver() {
-		return receiver;
-	}
-
-	public void setReceiver(User receiver) {
-		this.receiver = receiver;
-	}
+//	public User getReceiver() {
+//		return receiver;
+//	}
+//
+//	public void setReceiver(User receiver) {
+//		this.receiver = receiver;
+//	}
 
 	public Offer getOffer() {
 		return offer;

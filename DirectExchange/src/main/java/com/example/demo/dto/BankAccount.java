@@ -51,7 +51,7 @@ public class BankAccount {
 	private String supportMethod;
 
 	@ManyToOne( fetch = FetchType.LAZY)
-	@JoinColumn(name = "accounts", referencedColumnName = "id")
+	@JoinColumn(name = "user", referencedColumnName = "id")
 	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	public BankAccount()

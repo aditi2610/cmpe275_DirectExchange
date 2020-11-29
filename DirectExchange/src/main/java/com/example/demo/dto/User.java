@@ -15,6 +15,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -31,14 +32,20 @@ public class User {
 	@Column(name = "Email", nullable= false , unique = true, updatable = false)
 	private String email;
 	
-	@Column(name= "Name", nullable = false, unique = true)
-	private String name;
+	
+	@Column(name= "First_Name", nullable = false, unique = true)	
+	private String firstName;	
+		
+	@Column(name= "Last_Name", nullable = false, unique = true)	
+	private String lastName;	
+		
 	
 	@Column(name= "Password", nullable = false)
 	private String password;
 	
+	@JsonProperty
 	@Column(name= "IsVerified", nullable = false)
-	private String isVerified;
+	private boolean isVerified;
 
 	@OneToMany(mappedBy = "user")
 	private Set<BankAccount> accounts; 
@@ -56,9 +63,39 @@ public class User {
 	@OneToMany(mappedBy = "sender")
 	private Set<Transactions> senderTransections; 
 	
-	@OneToMany(mappedBy = "receiver")
-	private Set<Transactions> receiverTransections; 
+//	@OneToMany(mappedBy = "receiver")
+//	private Set<Transactions> receiverTransections; 
 	
+	public Set<Transactions> getSenderTransections() {
+		return senderTransections;
+	}
+
+//	public User(String firstName, String lastName, String email2, String password2) {	
+//		 this.firstName = firstName;	
+//		 this.lastName = lastName;	
+//		 this.email = email2;	
+//		 this.password = password2;	
+//		// this.isVerified = true;	
+//		}	
+
+	
+	public String getFirstName() {	
+		return firstName;	
+	}	
+	public void setFirstName(String firstName) {	
+		this.firstName = firstName;	
+	}	
+	public String getLastName() {	
+		return lastName;	
+	}	
+	public void setLastName(String lastName) {	
+		this.lastName = lastName;	
+	}	
+
+	public void setSenderTransections(Set<Transactions> senderTransections) {
+		this.senderTransections = senderTransections;
+	}
+
 	public Set<Offer> getOffers() {
 		return offers;
 	}
@@ -95,12 +132,12 @@ public class User {
 		this.password = password;
 	}
 
-	public String getIsVerified() {
-		return isVerified;
-	}
 
-	public void setIsVerified(String isVerified) {
-		this.isVerified = isVerified;
+	public Boolean getIsVerified() {	
+		return isVerified;	
+	}	
+	public void setIsVerified(Boolean isVerified) {	
+		this.isVerified = isVerified;	
 	}
 
 	public void setId(long id) {
@@ -115,13 +152,6 @@ public class User {
 		this.email = email;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 	@JsonIgnoreProperties({"accounts"})
 	public Set<BankAccount> getAccounts() {
 		return accounts;
