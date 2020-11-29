@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,7 +42,26 @@ public class BankAccountServiceImpl implements IBankAccountService {
 		return new ResponseEntity<>(bankAccount,HttpStatus.CREATED);
 	}
 
-
+	@Override
+	public ResponseEntity<?> getAccounts(Long userId) {
+		// TODO Auto-generated method stub
+		Optional<User> user = userRepository.findById(userId);
+		Set<BankAccount> ba=new HashSet<BankAccount>();
+		
+		if(user!=null)
+		{ User actualUser=user.get();
+			ba=bankRepository.findByUser(actualUser);
+			return new ResponseEntity<>(ba,HttpStatus.OK);
+			
+		}
+		else
+		{
+			return new ResponseEntity<>("No such user exists",HttpStatus.NOT_FOUND);
+			
+		}
+		
+		
+	}
 
 
 	@Override
@@ -67,4 +88,9 @@ public class BankAccountServiceImpl implements IBankAccountService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+
+
+	
 }

@@ -54,7 +54,10 @@ public class BankAccount {
 	@JoinColumn(name = "accounts", referencedColumnName = "id")
 	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
-	
+	public BankAccount()
+	{
+		
+	}
 	public BankAccount(String bankName, String country, String accountNumber, String ownerName,
 			String ownerAddress, String primaryCurrency, String supportMethod, User user) {
 		// TODO Auto-generated constructor stub

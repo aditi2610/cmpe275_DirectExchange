@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 public interface IBankAccountService {
 	
 		ResponseEntity<?> addBankAccount(String bankName, String country,String accountNumber,String ownerName, String ownerAddress, String primaryCurrency, String supportMethod,Long userId); 
+		
+		ResponseEntity<?> getAccounts(Long userId); 
 
 		ResponseEntity<?> getBankAccount(Long id); 
 
