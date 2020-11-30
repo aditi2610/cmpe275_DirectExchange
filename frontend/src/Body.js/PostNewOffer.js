@@ -1,19 +1,57 @@
+import Axios from 'axios';
 import React from 'react';
-import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Form, Row } from 'react-bootstrap';
+import { rooturl } from '../config/config';
 
 function PostNewOffer(props) {
+  let [responseMsg,setResponseMsg] = React.useState('');
+
+  let handleSubmit = (e) => {
+    e.preventDefault();
+    let form = e.target;
+    let formData = {
+      "sourceCountry" :form.sourceCountry.value,
+      "sourceCurrency" :form.sourceCurrency.value,
+      "amount" :parseInt(form.amount.value),
+      "destinationCountry" :form.destinationCountry.value,
+      "destinationCurrency" :form.destinationCurrency.value,
+      "exchangeRate" :parseInt(form.exchangeRate.value),
+      "expirationDate" :form.expirationDate.value,
+      "isCounterOfferAllowed" :form.isCounterOfferAllowed.checked,
+      "isSplitOfferAllowed" :form.isSplitOfferAllowed.checked,
+      "user": {
+          "id" :1,
+          "isVerified" :true,
+      }
+    }
+    console.log(formData);
+    Axios.post(`${rooturl}/createOffer`,formData,{validateStatus: false})
+    .then(response => {
+      if(response.status === 201){
+        form.reset();
+        setResponseMsg(<Alert variant='success'>Offer submitted successfully!</Alert>)
+      }else{
+        setResponseMsg(<Alert variant='danger'>{response.data["Bad Request"] && response.data["Bad Request"]['Error Message'] ? (response.data["Bad Request"]['Error Message']) : ('Something went wrong')}</Alert>)
+      }
+    })
+  }
+
   return (
     <Container>
       <Row>
         <Col sm='2'></Col>
         <Col>
-          <Form>
+          <Form onSubmit={e => handleSubmit(e)}>
+            <h3>Post a new offer</h3>
+            <br/>
+            {responseMsg}
             <Form.Group as={Row}>
               <Form.Label column sm="3">
                 Source Country
               </Form.Label>
               <Col sm="9">
-              <Form.Control label='select source country' name="SourceCountry" required as="select">
+              <Form.Control label='select source country' name="sourceCountry" required as="select" defaultValue=''>
+                <option value=''>Select Source Country</option>
                 <option value='India'>India</option>
                 <option value='Britan'>Britan</option>
                 <option value='India'>India</option>
@@ -27,7 +65,8 @@ function PostNewOffer(props) {
                 Source Currency
               </Form.Label>
               <Col sm="9">
-                <Form.Control label='select source currency' name="SourceCurrency" required as="select">
+                <Form.Control label='select source currency' name="sourceCurrency" required as="select" defaultValue=''>
+                  <option value=''>Select Source Currency</option>
                   <option value='EUR'>EUR</option>
                   <option value='GBP'>GBP</option>
                   <option value='INR'>INR</option>
@@ -41,7 +80,7 @@ function PostNewOffer(props) {
                 Amount
               </Form.Label>
               <Col sm="9">
-                <Form.Control name="Amount" type="number" step="0.1"  placeholder="Amount" />
+                <Form.Control name="amount" required type="number" step="0.1"  placeholder="Amount" />
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
@@ -49,7 +88,8 @@ function PostNewOffer(props) {
                 Destination Country
               </Form.Label>
               <Col sm="9">
-              <Form.Control label='select Destination country' name="DestinationCountry" required as="select">
+              <Form.Control label='select Destination country' required name="destinationCountry" required as="select" defaultValue=''>
+              <option value=''>Select Destination Country</option>
                 <option value='India'>India</option>
                 <option value='Britan'>Britan</option>
                 <option value='India'>India</option>
@@ -63,7 +103,8 @@ function PostNewOffer(props) {
                 Destination Currency
               </Form.Label>
               <Col sm="9">
-              <Form.Control label='select destination currency' name="DestinationCurrency" required as="select">
+              <Form.Control label='select destination currency' required name="destinationCurrency" required as="select" defaultValue=''>
+                <option value=''>Select Destination Currency</option>
                 <option value='EUR'>EUR</option>
                 <option value='GBP'>GBP</option>
                 <option value='INR'>INR</option>
@@ -77,7 +118,7 @@ function PostNewOffer(props) {
                 Exchange Rate
               </Form.Label>
               <Col sm="9">
-                <Form.Control name="ExchangeRate" type="number" step="0.01" placeholder="Exchange Rate" />
+                <Form.Control required name="exchangeRate" type="number" step="0.01" placeholder="Exchange Rate" />
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
@@ -85,7 +126,7 @@ function PostNewOffer(props) {
                 ExpirationDate
               </Form.Label>
               <Col sm="9">
-                <Form.Control name="ExpirationDate" type="date" placeholder="Expiration Date" />
+                <Form.Control required name="expirationDate" type="date" placeholder="Expiration Date" />
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
