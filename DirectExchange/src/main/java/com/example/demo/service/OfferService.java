@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.Exception.InvalidRequestException;
+import com.example.demo.exception.InvalidRequestException;
 import com.example.demo.dto.Offer;
 
 @Service
