@@ -13,23 +13,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.DynamicUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name="Offer")
+@DynamicUpdate
 public class Offer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name ="id")
-	private long id;
+	private Long id;
 	
 	@Column(name= "SourceCountry", nullable = false)
 	private String sourceCountry;
@@ -53,8 +52,8 @@ public class Offer {
 	private Date expirationDate;
 	
 	//@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="creationDate", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-	private Date creationDate;
+	@Column(name="creationDate", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP",updatable = false)
+	private Date creationDate = new Date();
 	
 	@JsonProperty
 	@Column(name= "isCounterOfferAllowed", nullable = false)
@@ -64,18 +63,25 @@ public class Offer {
 	@Column(name= "isSplitOfferAllowed", nullable = false)
 	private boolean isSplitOfferAllowed;
 
-	//0 for inActive, 1 for Active , 2 for inProcess , 3 - for Fulfilled
+	//0 for inActive, 1 for Active , 2  for Fulfilled
 	@Column(name="status", columnDefinition = "integer default 1")
-	private int status;
+	private int status = 1;
 	
 //	@ManyToOne
 //	private Offer parentOffer;
 //	
-    @ManyToOne
+	@ManyToOne(targetEntity = Offer.class)
     private Offer parentOffer;
     
     @Column(name="isCounterOffer")
     private boolean isCounterOffer;
+    
+    @ManyToOne(targetEntity = Offer.class)
+    private Offer matchingOffer;
+    
+    @JsonProperty
+    @Column(name="hasCounterParent", columnDefinition = "boolean default false")
+    private Boolean hasMatchingOffer = false;
     
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "user", referencedColumnName = "id")
@@ -85,15 +91,31 @@ public class Offer {
 	@OneToMany(mappedBy = "offer")
 	private Set<Transactions> transaction;
 	
+	public Offer getMatchingOffer() {
+		return matchingOffer;
+	}
+
+	public void setMatchingOffer(Offer matchingOffer) {
+		this.matchingOffer = matchingOffer;
+	}
+
+	public Boolean isHasMatchingOffer() {
+		return hasMatchingOffer;
+	}
+
+	public void setHasMatchingOffer(Boolean hasMatchingOffer) {
+		this.hasMatchingOffer = hasMatchingOffer;
+	}
+
 	public long getOfferId() {
 		return id;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

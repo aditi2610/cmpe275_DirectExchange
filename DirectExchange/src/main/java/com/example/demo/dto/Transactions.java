@@ -28,7 +28,7 @@ public class Transactions {
 	@Column(name ="id")
 	private long id;
 	
-	@ManyToOne( fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User sender;
 
@@ -55,7 +55,6 @@ public class Transactions {
 	//0 for inProgress, 1 successful
 	@Column(name="status")
 	private boolean status;
-	
 	
 	public User getSender() {
 		return sender;
