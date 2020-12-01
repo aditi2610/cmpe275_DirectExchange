@@ -14,18 +14,28 @@ class  AddBankAccount extends Component{
           supportMethod:'Send',
           userId:1,
           bankaccounts:[]
-           
+          
         }
         //Bind the handlers to this class
         this.inputHandler = this.inputHandler.bind(this);
-       
+      
 
     }
     componentDidMount=()=>
     {
        this.getBankAccounts();
     }
+   
+    getBankAccounts = async () => {
+      //let user = localStorage.getItem("user_id");
+      //let user = "5f8350d39bd6a608aae08c11";
+      //const params = { user: user }
+      let result = await axios.get(rooturl + '/bankaccount/'+this.state.userId)
+      let bankaccounts = result.data;
+      console.log(bankaccounts);
+      await this.setState({ bankaccounts });
 
+  };
     //Adding new bank account
     onAddBank = async (e) => {
         e.preventDefault();
@@ -45,29 +55,25 @@ class  AddBankAccount extends Component{
         console.log("data going to add bank account" + JSON.stringify(params));
         //set the with credentials to true
         axios.defaults.withCredentials = true;
-        axios.post(rooturl+'/bankaccount',null,{params})
+      await axios.post(rooturl+'/bankaccount',null,{params})
             .then(response => {
                 if (response.status === 200) {
                     this.setState({
                         showBankList: true
+                        
+
                     }); 
-                   // this.getBankAccounts();
+                 
                 }
             })
             .catch(err => {
                 this.setState({ errorMessage: "error" });
             })
-    }
-    getBankAccounts = async () => {
-      //let user = localStorage.getItem("user_id");
-      //let user = "5f8350d39bd6a608aae08c11";
-      //const params = { user: user }
-      let result = await axios.get(rooturl + '/bankaccount/'+this.state.userId)
-      let bankaccounts = result.data;
-      console.log(bankaccounts);
-      await this.setState({ bankaccounts });
 
-  };
+            this.getBankAccounts();
+        
+    }
+  
 
     inputHandler(event) {
         const target = event.target;
@@ -85,7 +91,10 @@ if(this.state.bankaccounts.length===0)
 {
 emptyList=(<h4>No Accounts to display</h4>);
 }
-    
+if(this.state.showBankList)
+{
+  this.getBankAccounts();
+}
         return(
 
              <Container>

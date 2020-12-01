@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.Common.CommonUtilities;
-import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dto.Offer;
+import com.example.demo.exception.InvalidRequestException;
 import com.example.demo.service.OfferService;
 
 @RestController

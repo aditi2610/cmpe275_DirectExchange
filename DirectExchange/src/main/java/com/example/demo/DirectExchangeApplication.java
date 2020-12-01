@@ -19,7 +19,7 @@ public class DirectExchangeApplication {
 		return new WebMvcConfigurerAdapter() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-            	System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+            	
 
 				registry.addMapping("/**").allowedOriginPatterns("*").allowedMethods("GET", "POST","PUT","OPTIONS",
 						"DELETE").allowCredentials(true);
