@@ -1,7 +1,7 @@
 import Axios from 'axios';
 import React from 'react';
 import { Alert, Button, Col, Container, Form, Row } from 'react-bootstrap';
-import { rooturl } from '../config/config';
+import { rooturl } from '../../config/config';
 
 function PostNewOffer(props) {
   let [responseMsg,setResponseMsg] = React.useState('');
@@ -25,7 +25,7 @@ function PostNewOffer(props) {
       }
     }
     console.log(formData);
-    Axios.post(`${rooturl}/createOffer`,formData,{validateStatus: false})
+    Axios.post(`${rooturl}/offer`,formData,{validateStatus: false})
     .then(response => {
       if(response.status === 201){
         form.reset();
@@ -54,7 +54,6 @@ function PostNewOffer(props) {
                 <option value=''>Select Source Country</option>
                 <option value='India'>India</option>
                 <option value='Britan'>Britan</option>
-                <option value='India'>India</option>
                 <option value='China'>China</option>
                 <option value='USA'>USA</option>
               </Form.Control>
@@ -123,7 +122,7 @@ function PostNewOffer(props) {
             </Form.Group>
             <Form.Group as={Row}>
               <Form.Label column sm="3">
-                ExpirationDate
+                Expiration Date
               </Form.Label>
               <Col sm="9">
                 <Form.Control required name="expirationDate" type="date" placeholder="Expiration Date" />

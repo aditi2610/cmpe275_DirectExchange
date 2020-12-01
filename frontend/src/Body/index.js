@@ -2,12 +2,13 @@ import React from 'react';
 import Switch from 'react-bootstrap/esm/Switch';
 import { Route } from 'react-router-dom';
 import Home from './Home';
-import MyOffers from './MyOffers';
-import PostNewOffer from './PostNewOffer';
 import SignIn from './SignIn';
 import SignOut from './SignOut';
 import AddBankAccount from './AddBankAccount';
-import PrevailingRates from './PrevailingRates';
+import MyOffers from './offer/MyOffers';
+import PostNewOffer from './offer/PostNewOffer';
+import EditOffer from './offer/EditOffer';
+import BrowseOffers from './offer/BrowseOffers';
 
 function Body(props) {
   return (
@@ -18,8 +19,9 @@ function Body(props) {
       <Route exact path="/sign-in" component={SignIn} />
       <Route exact path="/sign-out" component={SignOut} />
       <Route exact path="/post-offer" component={PostNewOffer} />
+      <Route exact path="/offer/:id/edit" component={EditOffer} />
       <Route exact path="/addBank" component={AddBankAccount} />
-      <Route exact path="/prevailing-rates" component={PrevailingRates} />
+      <Route exact path="/browse-offers" component={BrowseOffers} />
     </Switch>
   );
 }

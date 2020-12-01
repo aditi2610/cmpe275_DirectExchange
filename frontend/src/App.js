@@ -2,7 +2,7 @@ import {BrowserRouter as Router} from 'react-router-dom'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Header from './Header/index.js';
-import Body from './Body.js';
+import Body from './Body';
 
 function App() {
   return (
