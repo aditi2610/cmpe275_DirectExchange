@@ -118,7 +118,7 @@ if(this.state.showBankList)
               <Form.Control label='select Bank country' name="country" required as="select" onChange={this.inputHandler}>
                 <option value='India'>India</option>
                 <option value='Britan'>Britan</option>
-                <option value='India'>Germany</option>
+                <option value='Germany'>Germany</option>
                 <option value='China'>China</option>
                 <option value='USA'>USA</option>
               </Form.Control>
