@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -24,4 +25,8 @@ public interface OfferService {
 	public List<Offer> findOffersForUser(Long userId) throws Exception;
 
 	public List<Offer> findAll() throws Exception;
+
+	public List<Offer> findCounterOffers(Long id) throws Exception;
+
+	public HashMap<String, Object> getMatchingOffer(Long id) throws Exception;
 }

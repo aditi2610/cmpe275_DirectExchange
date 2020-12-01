@@ -37,7 +37,7 @@ public class Offer {
 	private String sourceCurrency;
 	
 	@Column(name= "Amount", nullable = false)
-	private double amount;
+	private Double amount;
 	
 	@Column(name= "DestinationCountry", nullable = false)
 	private String destinationCountry;
@@ -46,7 +46,7 @@ public class Offer {
 	private String destinationCurrency;
 	
 	@Column(name= "ExchangeRate", nullable = false)
-	private double exchangeRate;
+	private Double exchangeRate;
 	
 	@Column(name= "ExpirationDate", nullable = false)
 	private Date expirationDate;
@@ -64,8 +64,8 @@ public class Offer {
 	private boolean isSplitOfferAllowed;
 
 	//0 for inActive, 1 for Active , 2  for Fulfilled
-	@Column(name="status", columnDefinition = "integer default 1")
-	private int status = 1;
+	@Column(name="status", columnDefinition = "integer default 0")
+	private int status = 0;
 	
 //	@ManyToOne
 //	private Offer parentOffer;
@@ -73,6 +73,7 @@ public class Offer {
 	@ManyToOne(targetEntity = Offer.class)
     private Offer parentOffer;
     
+	@JsonProperty
     @Column(name="isCounterOffer")
     private boolean isCounterOffer;
     
@@ -155,11 +156,11 @@ public class Offer {
 		this.sourceCurrency = sourceCurrency;
 	}
 
-	public double getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(double amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 

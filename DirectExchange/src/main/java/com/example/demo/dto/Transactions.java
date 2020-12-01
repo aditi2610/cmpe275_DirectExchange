@@ -36,6 +36,9 @@ public class Transactions {
 //	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 //	private User receiver;
 
+	@Column(name = "servieFee")
+	private double servieFee;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="offer", referencedColumnName ="id")
 	private Offer offer;

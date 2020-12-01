@@ -1,8 +1,11 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -60,11 +63,11 @@ public class OfferServiceImp implements OfferService{
 			if(!temp.isPresent()) {
 				throw new InvalidRequestException("InValid Request. Matching offer mismatch.");
 			}
-			if(!offer.getSourceCurrency().equals(temp.get().getDestinationCurrency()) || !offer.getDestinationCurrency().equals(temp.get().getSourceCurrency())) {
+			if(!offer.getSourceCurrency().equals(temp.get().getSourceCurrency()) || !offer.getDestinationCurrency().equals(temp.get().getDestinationCurrency())) {
 				throw new InvalidRequestException("InValid Request for counter offer. Source and Destination currency does not match");				
 			}
-			double lowerLimit = temp.get().getAmount() * offer.getExchangeRate() * 0.90;
-			double upperLimit = temp.get().getAmount() * offer.getExchangeRate() * 1.10; 
+			double lowerLimit = temp.get().getAmount() * 0.90;
+			double upperLimit = temp.get().getAmount()  * 1.10; 
 			if(offer.getAmount() < lowerLimit || offer.getAmount() > upperLimit) {
 				throw new InvalidRequestException("InValid Request for counter offer. Amount exceeds 10% lower or upper bound");						
 			}
@@ -122,7 +125,7 @@ public class OfferServiceImp implements OfferService{
 	}
 	
 	public Offer delete(Long id, boolean flag) throws Exception {
-		Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(id, 1);
+		Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(id, CommonConstants.OFFER_ACTIVE);
 		if(!offerOptional.isPresent()) {
 			throw new InvalidRequestException("Offer with given id does not exists.");		
 		}
@@ -147,6 +150,77 @@ public class OfferServiceImp implements OfferService{
 		return offerRepository.findByUser_IdOrderByStatusAsc(userId);
 	}
 	
+	@Override
+	public List<Offer> findCounterOffers(Long id) throws Exception{
+		 return offerRepository.findByParentOffer_IdAndStatus(id, CommonConstants.OFFER_ACTIVE);	
+	}
+
+	@Override
+	public HashMap<String, Object> getMatchingOffer(Long id) throws Exception {
+		Optional<Offer> offerOptional = offerRepository.findById(id);
+		if(!offerOptional.isPresent()) {
+			throw new InvalidRequestException("Offer with given id does not exists.");
+		}
+		Offer offer = offerOptional.get();
+		HashMap<String,Object> map = new HashMap<>();
+		map.put("counterOffer", findCounterOffers(id));
+		double amount = offer.getAmount() * offer.getExchangeRate();
+		List<Offer> exactMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndAmountAndStatusAndIsCounterOffer(offer.getDestinationCurrency(), offer.getSourceCurrency(), amount , CommonConstants.OFFER_ACTIVE, false);
+		map.put("exactMath", exactMatch);
+		List<Offer> rangeMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndAmountBetweenAndIsCounterOfferAndAmountNotOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_ACTIVE, amount*0.90, amount *1.10, false, amount);
+		map.put("rangeMath", rangeMatch);
+		List<Offer> forSplitMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_ACTIVE, false);
+//		List<Offer> listOfC = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndAmountGratherThanAndStatusAndIsCounterOfferOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), amount, CommonConstants.OFFER_ACTIVE, false);
+//		List<Offer> listOfB = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOffer(offer.getSourceCurrency(), offer.getDestinationCurrency(),CommonConstants.OFFER_ACTIVE, false);
+		
+		HashMap<Double, List<Offer>> offerFreq = new HashMap<>();
+		
+		List<List<Offer>> splitMathes = new ArrayList<>();
+//		for(Offer temp : listOfB) {
+//			offerFreq.computeIfAbsent(temp.getAmount(),k-> new ArrayList<>()).add(temp);
+//		}
+		checkForAEqualsBPlusC(amount, forSplitMatch, splitMathes);
+	//	checkForCMinusBEqualsA(amount,listOfC,  listOfB, splitMathes);
+		map.put("splitMatch", splitMathes);
+		return map;
+	}
+
+
+	private void checkForCMinusBEqualsA(double amount, List<Offer> listOfC, List<Offer> listOfB,
+			List<List<Offer>> splitMathes) {
+		int size = listOfC.size();
+		for(int i=0;i<size;i++) {
+			for(int j=0; j<listOfB.size(); j++) {
+				double sum = listOfC.get(i).getAmount() - (listOfB.get(j).getAmount() * listOfB.get(j).getExchangeRate());
+				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
+					List<Offer> temp= new ArrayList<>();
+					temp.add(listOfC.get(i));
+					temp.add(listOfB.get(j));
+					splitMathes.add(temp);
+				}
+			}
+		}
+	}
+
+	private void checkForAEqualsBPlusC(double amount, List<Offer> forSplitMatch, List<List<Offer>> splitMathes) {
+		int size = forSplitMatch.size();
+		for(int i=0;i< size-1;i++) {
+			int j= size-1;
+			while(i<j) {
+				double sum = forSplitMatch.get(i).getAmount() + forSplitMatch.get(j).getAmount();
+				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
+					List<Offer> temp= new ArrayList<>();
+					temp.add(forSplitMatch.get(i));
+					temp.add(forSplitMatch.get(j));
+					splitMathes.add(temp);
+				}else {
+					break;
+				}
+				j--;
+			}
+		}		
+	}
+
 	//Can have Transaction Object.
 	@Override
 	public boolean acceptOffer(Set<Offer> offers) throws Exception {
@@ -212,5 +286,4 @@ public class OfferServiceImp implements OfferService{
 	    String[] result = new String[emptyNames.size()];
 	    return emptyNames.toArray(result);
 	}
-
 }

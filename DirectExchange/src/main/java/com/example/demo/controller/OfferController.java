@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -99,7 +102,35 @@ public class OfferController {
 		}
 		return new ResponseEntity<>(newOffer,HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="offer/getCounterOffer/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllCounterOfferByOfferID(@PathVariable("id") Long id){
+		List<Offer> newOffer;
+		try {
+			newOffer = offerService.findCounterOffers(id);
+		} catch (InvalidRequestException e) {
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(newOffer,HttpStatus.OK);
+	}
 
+	@RequestMapping(value="offer/matchingOffer", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<?> getMatchingOffer(@PathParam("id") Long id){
+		HashMap<String,Object> newOffer;
+		try {
+			newOffer = offerService.getMatchingOffer(id);
+		} catch (InvalidRequestException e) {
+				e.printStackTrace();
+				return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(newOffer,HttpStatus.OK);
+	} 
+	
 	@RequestMapping(value="offer/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<?> deleteOffer(@PathVariable Long id){
