@@ -9,6 +9,7 @@ import MyOffers from './offer/MyOffers';
 import PostNewOffer from './offer/PostNewOffer';
 import EditOffer from './offer/EditOffer';
 import BrowseOffers from './offer/BrowseOffers';
+import PrevailingRates from './PrevailingRates'
 
 function Body(props) {
   return (
@@ -22,6 +23,7 @@ function Body(props) {
       <Route exact path="/offer/:id/edit" component={EditOffer} />
       <Route exact path="/addBank" component={AddBankAccount} />
       <Route exact path="/browse-offers" component={BrowseOffers} />
+      <Route exact path="/prevailing-rates" component={PrevailingRates} />
     </Switch>
   );
 }

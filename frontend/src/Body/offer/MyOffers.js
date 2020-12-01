@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Card, Col, Container, ListGroup, Nav, Row, Spinner, Tab } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { rooturl } from '../../config/config';
+import MatchingOffers from './MatchingOffers';
 
 function MyOffers(props) {
   let [offers,setOffers] = React.useState([]);
@@ -55,21 +56,27 @@ function MyOffers(props) {
                 {offers.map(offer => {
                     return <Tab.Pane eventKey={offer.id}>
                       <h4>Offer Details</h4>
-                      <Row>
-                        <Col><b>Amount :</b> {offer.amount}</Col>
-                        <Col><b>Source Country :</b> {offer.sourceCountry}</Col>
-                        <Col><b>Source Currency :</b> {offer.sourceCurrency}</Col>
-                      </Row>
-                      <Row>
-                        <Col><b>Destination Country :</b> {offer.destinationCountry}</Col>
-                        <Col><b>Destination Currency :</b> {offer.destinationCurrency}</Col>
-                        <Col><b>Exchange Rate :</b> {offer.exchangeRate}</Col>
-                      </Row>
+                      <Card>
+                        <Card.Body>
+                        <Row>
+                          <Col><b>Amount :</b> {offer.amount}</Col>
+                          <Col><b>Source Country :</b> {offer.sourceCountry}</Col>
+                          <Col><b>Source Currency :</b> {offer.sourceCurrency}</Col>
+                        </Row>
+                        <Row>
+                          <Col><b>Destination Country :</b> {offer.destinationCountry}</Col>
+                          <Col><b>Destination Currency :</b> {offer.destinationCurrency}</Col>
+                          <Col><b>Exchange Rate :</b> {offer.exchangeRate}</Col>
+                        </Row>
+                        <br/>
+                        <Row>
+                          <Col><Link to={`/offer/${offer.id}/edit`}><Button variant='primary'>Edit</Button></Link>{' '}<Button variant='danger' onClick={handleDelete}>Delete</Button>
+                          </Col>
+                        </Row>
+                        </Card.Body>
+                      </Card>
                       <br/>
-                      <Row>
-                        <Col><Link to={`/offer/${offer.id}/edit`}><Button variant='primary'>Edit</Button></Link>{' '}<Button variant='danger' onClick={handleDelete}>Delete</Button>
-                        </Col>
-                      </Row>
+                      <MatchingOffers id={offer.id}/>
                     </Tab.Pane>
                   })}
                 </Tab.Content>
