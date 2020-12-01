@@ -1,8 +1,8 @@
 import {BrowserRouter as Router} from 'react-router-dom'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Header from './Header.js';
-import Body from './Body.js';
+import Header from './Header/index.js';
+import Body from './Body';
 
 function App() {
   return (
@@ -10,6 +10,7 @@ function App() {
       <div className="App">
         <Router>
           <Header/>
+          <br/>
           <br/>
           <Body/>
         </Router>
