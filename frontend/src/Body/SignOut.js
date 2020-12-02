@@ -3,7 +3,8 @@ import { Redirect } from 'react-router-dom';
 
 const SignOut = () => {
   localStorage.removeItem('email');
-  localStorage.removeItem('userType');
+  localStorage.removeItem('nickName');
+  localStorage.removeItem('userId');
   return <Redirect to={`/home`} />;
 };
 

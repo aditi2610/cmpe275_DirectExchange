@@ -11,17 +11,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-
+import com.example.demo.Common.CommonUtilities;
 import com.example.demo.service.IBankAccountService;
+import com.example.demo.service.IExchangeRateService;
 
 
-//@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
+
 @CrossOrigin
 @RestController
 public class ControllerClass {
 
 	@Autowired
 	private IBankAccountService BankAccountService;
+	@Autowired
+	private IExchangeRateService ExchangeService;
 
 	
 //Adding New Bank Account
@@ -64,5 +67,43 @@ System.out.println(bankName+" "+"country "+country+accountNumber+ownerName+owner
 
 		return res;
 	}
+	
+	//Adding All exchange rates
+	
+	@RequestMapping(value="exchangerate" , method = RequestMethod.POST)	
+	public ResponseEntity<?> addExchangeRate(
+			@RequestParam(value="country",required=false) String country,
+			@RequestParam(value="currencyCode",required=false) String currencyCode,
+			@RequestParam(value="rate",required=false) Double rate
+			
+			
+			) 
+	{ 
+
+		ResponseEntity<?> res = null;
+		try {
+			res = ExchangeService.addExchangeRate(country,currencyCode, rate);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return res;
+	}
+	//Getting All Exchange rates
+
+		@RequestMapping(value="exchangerate" , method = RequestMethod.GET)	
+		public ResponseEntity<?> getExchangeRates()
+
+		{ 
+			ResponseEntity<?> res = null;
+			try {
+				res = ExchangeService.getExchangeRates();
+			} catch (Exception e) {
+				e.printStackTrace();
+				
+			}
+
+			return res;
+		}
 
 }

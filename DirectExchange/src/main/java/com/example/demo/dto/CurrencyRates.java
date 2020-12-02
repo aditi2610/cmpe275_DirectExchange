@@ -19,11 +19,26 @@ public class CurrencyRates {
 	@Column(name="country")
 	private String country;
 	
-	@Column(name="countryCode")
-	private String countryCode;
+	@Column(name="currencyCode")
+	private String currencyCode;
 
 	@Column(name="rate")
 	private double rate;
+	
+	public CurrencyRates()
+	{
+		
+	}
+	public CurrencyRates(String country, String currencyCode, double rate) {
+		// TODO Auto-generated constructor stub
+		
+		this.country=country;
+		this.currencyCode=currencyCode;
+		this.rate=rate;
+		
+		
+		
+	}
 
 	public long getId() {
 		return id;
@@ -41,12 +56,12 @@ public class CurrencyRates {
 		this.country = country;
 	}
 
-	public String getCountryCode() {
-		return countryCode;
+	public String getCurrencyCode() {
+		return currencyCode;
 	}
 
-	public void setCountryCode(String countryCode) {
-		this.countryCode = countryCode;
+	public void setCurrencyCode(String currencyCode) {
+		this.currencyCode = currencyCode;
 	}
 
 	public double getRate() {
