@@ -53,30 +53,39 @@ function SignIn(props) {
 }
   
 
-  const handleUserSigninSubmit = (e) => {
+  const handleUserSigninSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
     // set the with credentials to true
     // make a post request with the user data
-    const formData = {
-      email_id: form.email.value,
+    const params = {
+      email: form.email.value,
       password: form.password.value,
     };
-    // axios.post(`${rooturl}/core/user/login`, formData,{ validateStatus: false })
-    // .then((response) => {
-    //   console.log('Status Code : ', response.status);
-    //   if (response.status === 200) {
-    //       localStorage.setItem('token', response.data.token);
-    //       localStorage.setItem("userType", response.data.user_details.user_type);
-    //       localStorage.setItem("email", formData.email);
-    //       setShow(false);
-    //   }else{
-    //     let errors = Object.values(response.data || {'error' : ['Something went wrong']});
-    //     showUserLoginError(errors.map(error => {
-    //       return <Alert variant="danger">{error}</Alert>
-    //     }));
-    //   }
-    //});
+    console.log(JSON.stringify(params))
+   await axios.post(rooturl+'/user/login',null, {params})
+    .then((response) => {
+      console.log('Status Code : ', response.status);
+      if (response.status === 200) {
+          localStorage.setItem("nickName", response.data.nickName);
+          localStorage.setItem("userId", response.data.id);
+          localStorage.setItem("email", params.email);
+          setShow(false);
+      }else{
+        let errors = Object.values(response.data || {'error' : ['Something went wrong']});
+        showUserLoginError(errors.map(error => {
+          return <Alert variant="danger">{error}</Alert>
+        }));
+      }
+    })
+    .catch(err=>{
+      console.log(err)
+      let errors = Object.values(err.data || {'error' : ['Invalid Credentials or user not verified']});
+        showUserLoginError(errors.map(error => {
+          return <Alert variant="danger">{error}</Alert>
+  }))
+})
+    ;
   }
 
   return (

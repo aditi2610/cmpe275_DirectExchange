@@ -12,7 +12,7 @@ class  AddBankAccount extends Component{
           country:'India',
           primaryCurrency:'INR',
           supportMethod:'Send',
-          userId:1,
+          // userId:1,
           bankaccounts:[]
           
         }
@@ -27,10 +27,10 @@ class  AddBankAccount extends Component{
     }
    
     getBankAccounts = async () => {
-      //let user = localStorage.getItem("user_id");
+      let userId = localStorage.getItem("userId");
       //let user = "5f8350d39bd6a608aae08c11";
       //const params = { user: user }
-      let result = await axios.get(rooturl + '/bankaccount/'+this.state.userId)
+      let result = await axios.get(rooturl + '/bankaccount/'+userId)
       let bankaccounts = result.data;
       console.log(bankaccounts);
       await this.setState({ bankaccounts });
@@ -47,8 +47,8 @@ class  AddBankAccount extends Component{
           ownerName:this.state.ownerName,
           ownerAddress:this.state.ownerAddress,
           supportMethod:this.state.supportMethod,
-          userId:this.state.userId
-            //userId:localStorage.getItem("user_id")
+         // userId:this.state.userId
+            userId:localStorage.getItem("userId")
             //userId is hardcoded for now need to cheange once login is done
 
         }

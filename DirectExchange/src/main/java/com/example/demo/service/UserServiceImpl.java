@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,28 @@ public class UserServiceImpl implements IUserService {
 		else
 		{
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", "User Already registered with this email" ),HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	@Override
+	public ResponseEntity<?> loginUser(String email, String password,HttpSession session) throws InvalidRequestException {
+		// TODO Auto-generated method stub
+		
+		User user=userRepository.findByEmailAndPassword(email,password);
+		if(user!=null)
+		{
+			if(user.getIsVerified())
+		{
+			return new ResponseEntity<>(user,HttpStatus.OK);
+		}
+		else
+		{
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", "User not yet verified " ),HttpStatus.UNAUTHORIZED);
+		}
+		}
+		else
+		{
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "404", "INVALID CREDENTIALS " ),HttpStatus.NOT_FOUND);
 		}
 		
 	}

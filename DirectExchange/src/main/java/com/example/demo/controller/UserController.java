@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,4 +42,25 @@ public class UserController {
 		return res;
 	}
 
+	
+	//User Login
+	
+		@RequestMapping(value="user/login" , method = RequestMethod.POST)	
+		public ResponseEntity<?> loginUser(
+				@RequestParam(value="email",required=false) String email,
+				@RequestParam(value="password",required=false) String password,
+				HttpSession session)
+				
+		{ 
+
+			ResponseEntity<?> res = null;
+			try {
+		System.out.println(email+" "+password);
+				res = UserService.loginUser(email, password,session);
+			} catch (InvalidRequestException e) {
+				e.printStackTrace();
+				return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+			}
+			return res;
+		}
 }
