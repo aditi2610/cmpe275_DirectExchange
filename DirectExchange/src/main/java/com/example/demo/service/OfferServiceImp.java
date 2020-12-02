@@ -254,35 +254,35 @@ public class OfferServiceImp implements OfferService{
 	@Override
 	public boolean acceptOffer(Set<Offer> offers) throws Exception {
 		
-////		Iterator<Offer> itr = offers.iterator();
-////	     while(itr.hasNext()) {
-////	    	 Offer offer = itr.next();
-////	    	 Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(offer.getId(), CommonConstants.OFFER_ACTIVE);
-////	    	 if(!offerOptional.isPresent()) {
-////	    			throw new InvalidRequestException(" Offer is not valid.");		
-////	    	 }
-////	   		 offer = offerOptional.get();
-////	   		 List<Offer> counterOffers = offerRepository.findByParentOfferAndStatus(offer, CommonConstants.OFFER_ACTIVE);
-////	   		 for(Offer temp : counterOffers) {
-////	   			 try {
-////					delete(temp.getId(), false);
-////				} catch (Exception e) {
-////					throw e;
-////				}
-////	   		 }
-////	    	 Transactions tran = new Transactions();
-////		     tran.setDestinationCurrency(offer.getDestinationCurrency());
-////		     tran.setSourceCurrency(offer.getSourceCurrency());
-////		     tran.setOffer(offer);
-////		     tran.setSender(offer.getUser());
-////		     tran.setSendingAmount(offer.getAmount());
-////		     tran.setRecevingAmount(offer.getAmount() * offer.getExchangeRate() * 0.95);
-////		     tran.setStatus(false);
-////		     transactionsRepository.save(tran);
-////		     offer.setStatus(CommonConstants.OFFER_FULFILLED);
-////		     //offer.setStatus(2);
-////		     offerRepository.save(offer);	
-//	     }
+//		Iterator<Offer> itr = offers.iterator();
+//	     while(itr.hasNext()) {
+//	    	 Offer offer = itr.next();
+//	    	 Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(offer.getId(), CommonConstants.OFFER_ACTIVE);
+//	    	 if(!offerOptional.isPresent()) {
+//	    			throw new InvalidRequestException(" Offer is not valid.");		
+//	    	 }
+//	   		 offer = offerOptional.get();
+//	   		 List<Offer> counterOffers = offerRepository.findByParentOfferAndStatus(offer, CommonConstants.OFFER_ACTIVE);
+//	   		 for(Offer temp : counterOffers) {
+//	   			 try {
+//					delete(temp.getId(), false);
+//				} catch (Exception e) {
+//					throw e;
+//				}
+//	   		 }
+//	    	 Transactions tran = new Transactions();
+//		     tran.setDestinationCurrency(offer.getDestinationCurrency());
+//		     tran.setSourceCurrency(offer.getSourceCurrency());
+//		     tran.setOffer(offer);
+//		     tran.setSender(offer.getUser());
+//		     tran.setSendingAmount(offer.getAmount());
+//		     tran.setRecevingAmount(offer.getAmount() * offer.getExchangeRate() * 0.95);
+//		     tran.setStatus(false);
+//		     transactionsRepository.save(tran);
+//		     offer.setStatus(CommonConstants.OFFER_FULFILLED);
+//		     //offer.setStatus(2);
+//		     offerRepository.save(offer);	
+	//     }
 	     
 		return false;
 	}

@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Common.CommonUtilities;
+import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dao.UserRepository;
 import com.example.demo.dto.User;
-import com.example.demo.exception.InvalidRequestException;
 
 
 @Service

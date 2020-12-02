@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dao.CurrencyRatesRepository;
 import com.example.demo.dto.CurrencyRates;
-import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.Exception.InvalidRequestException;
 
 
 @Service
