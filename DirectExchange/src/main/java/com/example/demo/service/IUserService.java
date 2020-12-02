@@ -4,7 +4,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.http.ResponseEntity;
 
-import com.example.demo.Exception.InvalidRequestException;
+import com.example.demo.exception.InvalidRequestException;
 
 public interface IUserService {
 

@@ -6,11 +6,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dto.Offer;
+import com.example.demo.exception.InvalidRequestException;
 
 @Service
-public interface OfferService {
+public interface IOfferService {
 
 	public Offer add(Offer offer) throws Exception;
 

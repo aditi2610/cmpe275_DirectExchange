@@ -8,25 +8,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.transaction.Transactional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.example.demo.Common.CommonConstants;
-import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dao.BankRepository;
 import com.example.demo.dao.OfferRepository;
 import com.example.demo.dao.TransactionsRepository;
 import com.example.demo.dto.BankAccount;
 import com.example.demo.dto.Offer;
-import com.example.demo.dto.Transactions;
 import com.example.demo.dto.User;
+import com.example.demo.exception.InvalidRequestException;
 
 @Service
 @Transactional
-public class OfferServiceImp implements OfferService{
+public class OfferServiceImp implements IOfferService{
 
 	@Autowired
 	private OfferRepository offerRepository;

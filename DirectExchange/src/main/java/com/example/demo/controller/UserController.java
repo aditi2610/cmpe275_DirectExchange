@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.Common.CommonUtilities;
-import com.example.demo.Exception.InvalidRequestException;
+import com.example.demo.exception.InvalidRequestException;
 import com.example.demo.service.IUserService;
 
 @CrossOrigin
