@@ -54,6 +54,7 @@ public class BankAccount {
 	@JoinColumn(name = "accounts", referencedColumnName = "id")
 	//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
+	
 	public BankAccount()
 	{
 		

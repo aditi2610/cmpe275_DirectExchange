@@ -27,38 +27,73 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name ="id")
 	private long id;
-	
+
 	@Column(name = "Email", nullable= false , unique = true, updatable = false)
 	private String email;
-	
-	@Column(name= "Name", nullable = false, unique = true)
-	private String name;
-	
+
+	@Column(name= "First_Name", nullable = false, unique = true)
+	private String firstName;
+
+	@Column(name= "Last_Name", nullable = false, unique = true)
+	private String lastName;
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
 	@Column(name= "Password", nullable = false)
 	private String password;
-	
-	@Column(name= "IsVerified", nullable = false)
-	private String isVerified;
+
+	@Column(name= "IsVerified")
+	private boolean isVerified;
+
+	@Column(name= "verification_code", updatable = false)
+	private String verificationCode;
 
 	@OneToMany(mappedBy = "user")
 	private Set<BankAccount> accounts; 
-	
+
 	@OneToMany(mappedBy = "user")
 	private Set<Offer> offers; 
-	
+
 	@OneToMany(mappedBy = "sender")
 	private Set<Message> serderMsg; 
-	
+
 	@OneToMany(mappedBy = "receiver")
 	private Set<Message> receiverMsg; 
-	
-	
+
+
 	@OneToMany(mappedBy = "sender")
 	private Set<Transactions> senderTransections; 
-	
+
 	@OneToMany(mappedBy = "receiver")
 	private Set<Transactions> receiverTransections; 
-	
+
+	public User(String firstName, String lastName, String email2, String password2) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email2;
+		this.password = password2;
+		this.isVerified = false;
+	}
+
+	public User(){
+
+	}
+
+
 	public Set<Offer> getOffers() {
 		return offers;
 	}
@@ -95,11 +130,11 @@ public class User {
 		this.password = password;
 	}
 
-	public String getIsVerified() {
+	public Boolean getIsVerified() {
 		return isVerified;
 	}
 
-	public void setIsVerified(String isVerified) {
+	public void setIsVerified(Boolean isVerified) {
 		this.isVerified = isVerified;
 	}
 
@@ -115,13 +150,7 @@ public class User {
 		this.email = email;
 	}
 
-	public String getName() {
-		return name;
-	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
 	@JsonIgnoreProperties({"accounts"})
 	public Set<BankAccount> getAccounts() {
 		return accounts;
@@ -130,27 +159,37 @@ public class User {
 	public void setAccounts(Set<BankAccount> accounts) {
 		this.accounts = accounts;
 	}
+
+
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
+	}
+
 	@Override
-    public int hashCode() {
-        HashCodeBuilder hcb = new HashCodeBuilder();
-        hcb.append(id);
-        hcb.append(email);
-        return hcb.toHashCode();
-    }
- 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof User)) {
-            return false;
-        }
-        User that = (User) obj;
-        EqualsBuilder eb = new EqualsBuilder();
-        eb.append(id, that.id);
-        eb.append(email, that.email);
-        return eb.isEquals();
-    }
-	
+	public int hashCode() {
+		HashCodeBuilder hcb = new HashCodeBuilder();
+		hcb.append(id);
+		hcb.append(email);
+		return hcb.toHashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		User that = (User) obj;
+		EqualsBuilder eb = new EqualsBuilder();
+		eb.append(id, that.id);
+		eb.append(email, that.email);
+		return eb.isEquals();
+	}
+
 }

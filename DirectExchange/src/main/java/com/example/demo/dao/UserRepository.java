@@ -8,4 +8,5 @@ import com.example.demo.dto.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+	 public User findByVerificationCode(String verificationCode);
 }
