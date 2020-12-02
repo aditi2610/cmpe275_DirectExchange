@@ -8,4 +8,8 @@ import com.example.demo.dto.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+	public User findByEmail(String email);
+
+	public User findByNickName(String nickName);
+
 }

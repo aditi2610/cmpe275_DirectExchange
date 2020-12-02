@@ -18,30 +18,40 @@ function SignIn(props) {
     setCloseModal(<Redirect to={`/home`} />);
   }
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit =(e) => {
     e.preventDefault();
     const form = e.currentTarget;
     // set the with credentials to true
     // make a post request with the user data
-    const formData = {
-      last_name: form.lastName.value,
-      first_name: form.firstName.value,
-      email_id: form.email.value,
-      password: form.password.value,
+    const params = {
+      nickName:form.nickName.value,
+      email:form.email.value,
+      password:form.password.value,
     };
+    console.log(JSON.stringify(params))
     axios.defaults.withCredentials = true;
-    // axios.post(`${rooturl}/core/user/register`, formData,{ validateStatus: false })
-    // .then((response) => {
-    //   if (response.status === 201) {
-    //     showUserRegisterError(<Alert variant="success">Registration Successful. Please login once your account is verified</Alert>);
-    //   }else{
-    //     let errors = Object.values(response.data || {'error' : ['Something went wrong']});
-    //     showUserRegisterError(errors.map(error => {
-    //       return <Alert variant="danger">{error}</Alert>
-    //     }));
-    //   }
-    // });
-  }
+    axios.post(rooturl+'/user/register',null,{params})
+    .then((response) => {
+      console.log(response)
+      if (response.status === 201) {
+        showUserRegisterError(<Alert variant="success">Registration Successful. Please login once your account is verified</Alert>);
+      }else{
+        console.log(response.status)
+        let errors = Object.values(response.data || {'error' : ['Something went wrong']});
+        showUserRegisterError(errors.map(error => {
+          return <Alert variant="danger">{error}</Alert>
+        }));
+      }
+    })
+    .catch(err=>{
+      console.log(err)
+      let errors = Object.values(err.data || {'error' : ['Email or NickName already registered']});
+        showUserRegisterError(errors.map(error => {
+          return <Alert variant="danger">{error}</Alert>
+  }))
+})
+}
+  
 
   const handleUserSigninSubmit = (e) => {
     e.preventDefault();
@@ -106,12 +116,8 @@ function SignIn(props) {
             <Form onSubmit={handleRegisterSubmit}>
               {userRegisterError}            
               <Form.Group controlId="formBasicFirstName">
-                <Form.Label>First Name</Form.Label>
-                <Form.Control type="text" name='firstName' placeholder="First Name" required/>
-              </Form.Group>
-              <Form.Group controlId="formBasicLastName">
-                <Form.Label>Last Name</Form.Label>
-                <Form.Control type="text" name='lastName' placeholder="Last Name" required/>
+                <Form.Label>NickName</Form.Label>
+                <Form.Control type="text" name='nickName' placeholder="Nick Name" required/>
               </Form.Group>
               <Form.Group controlId="formBasicEmail">
                 <Form.Label>Email address</Form.Label>

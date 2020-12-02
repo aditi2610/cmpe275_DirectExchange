@@ -32,11 +32,13 @@ public class User {
 	@Column(name = "Email", nullable= false , unique = true, updatable = false)
 	private String email;
 	
+	@Column(name= "NickName", nullable = true, unique = true)	
+	private String nickName;
 	
-	@Column(name= "First_Name", nullable = false, unique = true)	
+	@Column(name= "First_Name", nullable = true, unique = true)	
 	private String firstName;	
 		
-	@Column(name= "Last_Name", nullable = false, unique = true)	
+	@Column(name= "Last_Name", nullable = true, unique = true)	
 	private String lastName;	
 		
 	@Column(name= "Password", nullable = false)
@@ -75,7 +77,17 @@ public class User {
 //		 this.email = email2;	
 //		 this.password = password2;	
 //		// this.isVerified = true;	
-//		}	
+//		}
+	public User()
+	{
+		
+	}
+	public User(String nickName, String email,String password) {	
+	 this.nickName = nickName;	
+	 this.email = email;	
+	 this.password = password;	
+	
+	}	
 
 	
 	public String getFirstName() {	
@@ -149,6 +161,13 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 
 	@JsonIgnoreProperties({"accounts"})
