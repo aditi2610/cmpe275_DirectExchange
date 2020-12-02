@@ -50,19 +50,22 @@ public class User {
 
 	@OneToMany(mappedBy = "user")
 	private Set<BankAccount> accounts; 
-	
+
 	@OneToMany(mappedBy = "user")
 	private Set<Offer> offers; 
-	
+
 	@OneToMany(mappedBy = "sender")
 	private Set<Message> serderMsg; 
-	
+
 	@OneToMany(mappedBy = "receiver")
 	private Set<Message> receiverMsg; 
-	
-	
+
+
 	@OneToMany(mappedBy = "sender")
 	private Set<Transactions> senderTransections; 
+
+	@Column(name= "verification_code", updatable = false)
+	private String verificationCode;
 	
 //	@OneToMany(mappedBy = "receiver")
 //	private Set<Transactions> receiverTransections; 
@@ -70,14 +73,6 @@ public class User {
 	public Set<Transactions> getSenderTransections() {
 		return senderTransections;
 	}
-
-//	public User(String firstName, String lastName, String email2, String password2) {	
-//		 this.firstName = firstName;	
-//		 this.lastName = lastName;	
-//		 this.email = email2;	
-//		 this.password = password2;	
-//		// this.isVerified = true;	
-//		}
 	public User()
 	{
 		
@@ -86,7 +81,7 @@ public class User {
 	 this.nickName = nickName;	
 	 this.email = email;	
 	 this.password = password;	
-	
+	 this.isVerified = false;
 	}	
 
 	
@@ -178,13 +173,24 @@ public class User {
 	public void setAccounts(Set<BankAccount> accounts) {
 		this.accounts = accounts;
 	}
+
+
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
+	}
+
 	@Override
-    public int hashCode() {
-        HashCodeBuilder hcb = new HashCodeBuilder();
-        hcb.append(id);
-        return hcb.toHashCode();
-    }
- 
+	public int hashCode() {
+		HashCodeBuilder hcb = new HashCodeBuilder();
+		hcb.append(id);
+		hcb.append(email);
+		return hcb.toHashCode();
+	}
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -197,6 +203,11 @@ public class User {
         EqualsBuilder eb = new EqualsBuilder();
         eb.append(id, that.id);
         return eb.isEquals();
-    }
+	}
+	
+	@Override
+	public String toString(){
+		return this.verificationCode;
+	}
 	
 }
