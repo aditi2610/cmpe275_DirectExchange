@@ -163,7 +163,6 @@ public class User {
     public int hashCode() {
         HashCodeBuilder hcb = new HashCodeBuilder();
         hcb.append(id);
-        hcb.append(email);
         return hcb.toHashCode();
     }
  
@@ -178,7 +177,6 @@ public class User {
         User that = (User) obj;
         EqualsBuilder eb = new EqualsBuilder();
         eb.append(id, that.id);
-        eb.append(email, that.email);
         return eb.isEquals();
     }
 	

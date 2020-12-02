@@ -3,9 +3,7 @@ package com.example.demo.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
 import javax.websocket.server.PathParam;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.demo.Common.CommonUtilities;
+import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dto.Offer;
-import com.example.demo.exception.InvalidRequestException;
 import com.example.demo.service.OfferService;
 
 @RestController
@@ -103,11 +100,11 @@ public class OfferController {
 		return new ResponseEntity<>(newOffer,HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="offer/getCounterOffer/{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllCounterOfferByOfferID(@PathVariable("id") Long id){
+	@RequestMapping(value="offer/getCounterOffer/{id}/userId/{userId}", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllCounterOfferByOfferID(@PathVariable("id") Long id,@PathVariable("userId") Long userId){
 		List<Offer> newOffer;
 		try {
-			newOffer = offerService.findCounterOffers(id);
+			newOffer = offerService.findCounterOffers(id,userId);
 		} catch (InvalidRequestException e) {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
@@ -118,10 +115,10 @@ public class OfferController {
 
 	@RequestMapping(value="offer/matchingOffer", method = RequestMethod.GET)
 	@ResponseBody
-	public ResponseEntity<?> getMatchingOffer(@PathParam("id") Long id){
+	public ResponseEntity<?> getMatchingOffer(@PathParam("id") Long id, @PathParam("userId") Long userId){
 		HashMap<String,Object> newOffer;
 		try {
-			newOffer = offerService.getMatchingOffer(id);
+			newOffer = offerService.getMatchingOffer(id, userId);
 		} catch (InvalidRequestException e) {
 				e.printStackTrace();
 				return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
@@ -134,16 +131,15 @@ public class OfferController {
 	@RequestMapping(value="offer/{id}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<?> deleteOffer(@PathVariable Long id){
-		Offer newOffer;
 		try {
-			newOffer = offerService.delete(id);
+			 offerService.delete(id);
 		} catch (InvalidRequestException e) {
 				e.printStackTrace();
 				return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(newOffer,HttpStatus.OK);
+		return new ResponseEntity<>("Offer Deleted Successfully",HttpStatus.OK);
 	} 
 
 	@RequestMapping(value="offer/accept", method = RequestMethod.POST)

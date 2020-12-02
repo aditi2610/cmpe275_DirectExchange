@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -39,6 +40,9 @@ public class Offer {
 	@Column(name= "Amount", nullable = false)
 	private Double amount;
 	
+	@Column(name= "destinationAmount")
+	private Double destinationAmount;
+	
 	@Column(name= "DestinationCountry", nullable = false)
 	private String destinationCountry;
 	
@@ -48,12 +52,12 @@ public class Offer {
 	@Column(name= "ExchangeRate", nullable = false)
 	private Double exchangeRate;
 	
-	@Column(name= "ExpirationDate", nullable = false)
-	private Date expirationDate;
+	@Column(name= "ExpirationDate", nullable = false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP + INTERVAL 5 MINUTE")
+	private LocalDateTime expirationDate;
 	
 	//@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="creationDate", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP",updatable = false)
-	private Date creationDate = new Date();
+	private LocalDateTime creationDate = LocalDateTime.now();
 	
 	@JsonProperty
 	@Column(name= "isCounterOfferAllowed", nullable = false)
@@ -82,7 +86,7 @@ public class Offer {
     
     @JsonProperty
     @Column(name="hasCounterParent", columnDefinition = "boolean default false")
-    private Boolean hasMatchingOffer = false;
+    private boolean hasMatchingOffer = false;
     
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "user", referencedColumnName = "id")
@@ -92,6 +96,14 @@ public class Offer {
 	@OneToMany(mappedBy = "offer")
 	private Set<Transactions> transaction;
 	
+	public Double getDestinationAmount() {
+		return destinationAmount;
+	}
+
+	public void setDestinationAmount(Double destinationAmount) {
+		this.destinationAmount = destinationAmount;
+	}
+
 	public Offer getMatchingOffer() {
 		return matchingOffer;
 	}
@@ -100,11 +112,11 @@ public class Offer {
 		this.matchingOffer = matchingOffer;
 	}
 
-	public Boolean isHasMatchingOffer() {
+	public boolean isHasMatchingOffer() {
 		return hasMatchingOffer;
 	}
 
-	public void setHasMatchingOffer(Boolean hasMatchingOffer) {
+	public void setHasMatchingOffer(boolean hasMatchingOffer) {
 		this.hasMatchingOffer = hasMatchingOffer;
 	}
 
@@ -180,27 +192,30 @@ public class Offer {
 		this.destinationCurrency = destinationCurrency;
 	}
 
-	public double getExchangeRate() {
+	public Double getExchangeRate() {
 		return exchangeRate;
 	}
 
-	public void setExchangeRate(double exchangeRate) {
+	public void setExchangeRate(Double exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
-
-	public Date getExpirationDate() {
+	
+	public LocalDateTime getExpirationDate() {
 		return expirationDate;
 	}
 
-	public void setExpirationDate(Date expirationDate) {
-		this.expirationDate = expirationDate;
+	public void setExpirationDate(LocalDateTime expirationDate) {
+		if(expirationDate == null) {
+			this.expirationDate =LocalDateTime.now().plusMinutes(5);
+		}else 
+			this.expirationDate = expirationDate;
 	}
 
-	public Date getCreationDate() {
+	public LocalDateTime getCreationDate() {
 		return creationDate;
 	}
 
-	public void setCreationDate(Date creationDate) {
+	public void setCreationDate(LocalDateTime creationDate) {
 		this.creationDate = creationDate;
 	}
 

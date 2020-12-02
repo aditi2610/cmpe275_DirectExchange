@@ -1,24 +1,21 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.transaction.Transactional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.example.demo.Common.CommonConstants;
-import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dao.BankRepository;
 import com.example.demo.dao.OfferRepository;
 import com.example.demo.dao.TransactionsRepository;
@@ -47,33 +44,44 @@ public class OfferServiceImp implements OfferService{
 			throw new InvalidRequestException("User is not Verified.");
 		}
 	
-		if(offer.getDestinationCurrency().equals(offer.getSourceCurrency())) {
-			throw new InvalidRequestException(" Source and destination Currency should not be same.");	
-		}
-		if(!checkDestinationBankAccountExists(user, offer.getSourceCurrency(), "Send")) {
-			throw new InvalidRequestException("User does not have source account with required permission");		
-		}
+		offer.setDestinationAmount(offer.getAmount() * offer.getExchangeRate());
+		if(!offer.isCounterOffer()) {
+			if(offer.getDestinationCurrency().equals(offer.getSourceCurrency())) {
+				throw new InvalidRequestException(" Source and destination Currency should not be same.");	
+			}
+			if(!checkDestinationBankAccountExists(user, offer.getSourceCurrency(), "Send")) {
+				throw new InvalidRequestException("User does not have source account with required permission");		
+			}
+			
+			if(!checkDestinationBankAccountExists(user, offer.getDestinationCurrency(), "Receive")) {
+				throw new InvalidRequestException("User does not have destination account with required permission");			
+			}
 		
-		if(!checkDestinationBankAccountExists(user, offer.getDestinationCurrency(), "Receive")) {
-			throw new InvalidRequestException("User does not have destination account with required permission");			
-		}
-		
-		if(offer.isCounterOffer()) {
-			Optional<Offer> temp = offerRepository.findById(offer.getMatchingOffer().getId());
+		} else {
+			Optional<Offer> temp = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getParentOffer().getId(), CommonConstants.OFFER_OPEN, LocalDateTime.now());
 			if(!temp.isPresent()) {
-				throw new InvalidRequestException("InValid Request. Matching offer mismatch.");
+				throw new InvalidRequestException("InValid Request. Offer you want to counter no longer exists.");
 			}
-			if(!offer.getSourceCurrency().equals(temp.get().getSourceCurrency()) || !offer.getDestinationCurrency().equals(temp.get().getDestinationCurrency())) {
-				throw new InvalidRequestException("InValid Request for counter offer. Source and Destination currency does not match");				
-			}
+			offer.setExpirationDate(offer.getExpirationDate());
+			offer.setSourceCountry(temp.get().getSourceCountry());
+			offer.setDestinationCountry(temp.get().getDestinationCountry());
+			offer.setSourceCurrency(temp.get().getSourceCurrency());
+			offer.setDestinationCurrency(temp.get().getDestinationCurrency());
+			offer.setSplitOfferAllowed(false);
+			offer.setCounterOfferAllowed(false);
 			double lowerLimit = temp.get().getAmount() * 0.90;
 			double upperLimit = temp.get().getAmount()  * 1.10; 
 			if(offer.getAmount() < lowerLimit || offer.getAmount() > upperLimit) {
 				throw new InvalidRequestException("InValid Request for counter offer. Amount exceeds 10% lower or upper bound");						
 			}
 			if(offer.isHasMatchingOffer()) {
-				temp.get().setStatus(CommonConstants.OFFER_INACTIVE);
-				offerRepository.save(temp.get());				
+				Optional<Offer> counterModeOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getMatchingOffer().getId(), CommonConstants.OFFER_OPEN, LocalDateTime.now());
+				if(!counterModeOffer.isPresent()) {
+					throw new InvalidRequestException("InValid Request. Offer you want to counter no longer exists.");
+				}
+				
+				counterModeOffer.get().setStatus(CommonConstants.OFFER_COUNTERMADE);
+				offerRepository.save(counterModeOffer.get());				
 			}
 		}
 		return offerRepository.save(offer);
@@ -90,14 +98,14 @@ public class OfferServiceImp implements OfferService{
 
 	@Override
 	public List<Offer> findAll() throws Exception{
-		List<Offer> allOffers = offerRepository.findByStatusAndIsCounterOffer(CommonConstants.OFFER_ACTIVE, false);
+		List<Offer> allOffers = offerRepository.findByStatusAndIsCounterOfferAndExpirationDateAfter(CommonConstants.OFFER_OPEN, false, LocalDateTime.now());
 		return allOffers;
 	}
 	
 	@Override
 	public Offer update(Offer offer) throws Exception {
 		User user = offer.getUser();
-		Optional<Offer> offerToBeUpdated = offerRepository.findByIdAndUserAndStatus(offer.getId(), user, CommonConstants.OFFER_ACTIVE);
+		Optional<Offer> offerToBeUpdated = offerRepository.findByIdAndUserAndExpirationDateAfterAndStatus(offer.getId(), user,  LocalDateTime.now(),CommonConstants.OFFER_OPEN);
 		if(!offerToBeUpdated.isPresent()) {
 			throw new InvalidRequestException("Invalid Request.Either this offer not exists or is no longer valid for update");	
 		}
@@ -120,68 +128,89 @@ public class OfferServiceImp implements OfferService{
 	}
 
 	@Override
-	public Offer delete(Long id) throws Exception {
-		return delete(id,true);
+	public void delete(Long id) throws Exception {
+		 delete(id,true);
 	}
 	
-	public Offer delete(Long id, boolean flag) throws Exception {
-		Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(id, CommonConstants.OFFER_ACTIVE);
+	public void delete(Long id, boolean flag) throws Exception {
+		Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(id, CommonConstants.OFFER_OPEN);
 		if(!offerOptional.isPresent()) {
 			throw new InvalidRequestException("Offer with given id does not exists.");		
 		}
 		Offer offerToBeDeleted = offerOptional.get();
-		if(offerToBeDeleted.isCounterOffer() && offerToBeDeleted.isHasMatchingOffer()) {
-			Optional<Offer> parentOffer = offerRepository.findById(offerToBeDeleted.getMatchingOffer().getId());
-			if(!parentOffer.isPresent()) {
-				throw new InvalidRequestException(" Cound not find parent offer.");		
-			}
-			if(flag) 
-				parentOffer.get().setStatus(CommonConstants.OFFER_ACTIVE);
-			else
-				parentOffer.get().setStatus(CommonConstants.OFFER_INACTIVE);
-			offerRepository.save(parentOffer.get());
+		if(offerToBeDeleted.isCounterOffer()) {
+			deleteCounterOffer(offerToBeDeleted, flag);
+		}else {
+			deleteAllCounterOffer(offerToBeDeleted);	
+			offerToBeDeleted.setStatus(CommonConstants.OFFER_EXPIRED);
+			offerRepository.save(offerToBeDeleted);
 		}
-		offerToBeDeleted.setStatus(CommonConstants.OFFER_INACTIVE);
-		return offerRepository.save(offerToBeDeleted);
 	}
 	
+	private void deleteCounterOffer(Offer offer, boolean flag) {
+		if(offer.isHasMatchingOffer()) {
+			Optional<Offer> matchedOffer = offerRepository.findById(offer.getMatchingOffer().getId());
+			if(flag) 
+				matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);
+			else
+				matchedOffer.get().setStatus(CommonConstants.OFFER_EXPIRED);
+				
+			offerRepository.save(matchedOffer.get());
+		}
+		offer.setStatus(CommonConstants.OFFER_EXPIRED);
+		offerRepository.save(offer);
+	}
+	private void deleteAllCounterOffer(Offer offerToBeDeleted) throws Exception {
+		List<Offer> counterOffers = findCounterOffers(offerToBeDeleted.getId()); 
+		for(Offer counterOffer:counterOffers) {
+			deleteCounterOffer(counterOffer,true);
+		}
+	}
+
 	@Override
 	public List<Offer> findOffersForUser(Long userId) throws Exception{
 		return offerRepository.findByUser_IdOrderByStatusAsc(userId);
 	}
 	
 	@Override
+	public List<Offer> findCounterOffers(Long id, Long userId) throws Exception{
+		 return offerRepository.findByParentOffer_IdAndStatusAndExpirationDateAfterAndUser_IdNot(id, CommonConstants.OFFER_OPEN, LocalDateTime.now(), userId);	
+	}
+	
 	public List<Offer> findCounterOffers(Long id) throws Exception{
-		 return offerRepository.findByParentOffer_IdAndStatus(id, CommonConstants.OFFER_ACTIVE);	
+		 return offerRepository.findByParentOffer_IdAndStatusAndExpirationDateAfter(id, CommonConstants.OFFER_OPEN, LocalDateTime.now());	
 	}
 
+
 	@Override
-	public HashMap<String, Object> getMatchingOffer(Long id) throws Exception {
-		Optional<Offer> offerOptional = offerRepository.findById(id);
+	public HashMap<String, Object> getMatchingOffer(Long id, Long userId) throws Exception {
+		Optional<Offer> offerOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(id, CommonConstants.OFFER_OPEN, LocalDateTime.now());
 		if(!offerOptional.isPresent()) {
 			throw new InvalidRequestException("Offer with given id does not exists.");
 		}
 		Offer offer = offerOptional.get();
 		HashMap<String,Object> map = new HashMap<>();
-		map.put("counterOffer", findCounterOffers(id));
+		
 		double amount = offer.getAmount() * offer.getExchangeRate();
-		List<Offer> exactMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndAmountAndStatusAndIsCounterOffer(offer.getDestinationCurrency(), offer.getSourceCurrency(), amount , CommonConstants.OFFER_ACTIVE, false);
+		List<Offer> exactMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndDestinationAmountAndStatusAndIsCounterOfferAndUser_IdNotAndExpirationDateAfter(offer.getDestinationCurrency(), offer.getSourceCurrency(), offer.getAmount() , CommonConstants.OFFER_OPEN, false,userId, LocalDateTime.now());
 		map.put("exactMath", exactMatch);
-		List<Offer> rangeMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndAmountBetweenAndIsCounterOfferAndAmountNotOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_ACTIVE, amount*0.90, amount *1.10, false, amount);
+		List<Offer> rangeMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndDestinationAmountBetweenAndIsCounterOfferAndDestinationAmountNotAndUser_IdNotAndExpirationDateAfterOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, offer.getAmount()*0.90, offer.getAmount() *1.10, false, amount, userId, LocalDateTime.now());
 		map.put("rangeMath", rangeMatch);
-		List<Offer> forSplitMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_ACTIVE, false);
-//		List<Offer> listOfC = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndAmountGratherThanAndStatusAndIsCounterOfferOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), amount, CommonConstants.OFFER_ACTIVE, false);
-//		List<Offer> listOfB = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOffer(offer.getSourceCurrency(), offer.getDestinationCurrency(),CommonConstants.OFFER_ACTIVE, false);
+		if(offer.isSplitOfferAllowed()) {
+			List<Offer> forSplitMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndUser_IdNotAndExpirationDateAfterOrderByDestinationAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, false, userId, LocalDateTime.now());
+			User user = new User();
+			user.setId(userId);
+			List<Offer> listOfC = offerRepository.getListOfC(user,offer.getDestinationCurrency(), offer.getSourceCurrency(), amount, CommonConstants.OFFER_OPEN, 0);
+			List<Offer> listOfB = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfter(offer.getSourceCurrency(), offer.getDestinationCurrency(),CommonConstants.OFFER_OPEN, false, LocalDateTime.now());
+			List<List<Offer>> splitMathes = new ArrayList<>();
+			checkForAEqualsBPlusC(offer.getAmount(), forSplitMatch, splitMathes);
+		 	checkForCMinusBEqualsA(amount,listOfC,  listOfB, splitMathes);
+			map.put("splitMatch", splitMathes);	
+		}
 		
-		HashMap<Double, List<Offer>> offerFreq = new HashMap<>();
-		
-		List<List<Offer>> splitMathes = new ArrayList<>();
-//		for(Offer temp : listOfB) {
-//			offerFreq.computeIfAbsent(temp.getAmount(),k-> new ArrayList<>()).add(temp);
-//		}
-		checkForAEqualsBPlusC(amount, forSplitMatch, splitMathes);
-	//	checkForCMinusBEqualsA(amount,listOfC,  listOfB, splitMathes);
-		map.put("splitMatch", splitMathes);
+		if(offer.isCounterOfferAllowed()) {
+			map.put("counterOffer", findCounterOffers(id, userId));
+		}
 		return map;
 	}
 
@@ -191,7 +220,7 @@ public class OfferServiceImp implements OfferService{
 		int size = listOfC.size();
 		for(int i=0;i<size;i++) {
 			for(int j=0; j<listOfB.size(); j++) {
-				double sum = listOfC.get(i).getAmount() - (listOfB.get(j).getAmount() * listOfB.get(j).getExchangeRate());
+				double sum = listOfC.get(i).getDestinationAmount() - listOfB.get(j).getAmount();
 				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
 					List<Offer> temp= new ArrayList<>();
 					temp.add(listOfC.get(i));
@@ -207,7 +236,7 @@ public class OfferServiceImp implements OfferService{
 		for(int i=0;i< size-1;i++) {
 			int j= size-1;
 			while(i<j) {
-				double sum = forSplitMatch.get(i).getAmount() + forSplitMatch.get(j).getAmount();
+				double sum = forSplitMatch.get(i).getDestinationAmount() + forSplitMatch.get(j).getDestinationAmount();
 				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
 					List<Offer> temp= new ArrayList<>();
 					temp.add(forSplitMatch.get(i));
@@ -225,35 +254,35 @@ public class OfferServiceImp implements OfferService{
 	@Override
 	public boolean acceptOffer(Set<Offer> offers) throws Exception {
 		
-		Iterator<Offer> itr = offers.iterator();
-	     while(itr.hasNext()) {
-	    	 Offer offer = itr.next();
-	    	 Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(offer.getId(), CommonConstants.OFFER_ACTIVE);
-	    	 if(!offerOptional.isPresent()) {
-	    			throw new InvalidRequestException(" Offer is not valid.");		
-	    	 }
-	   		 offer = offerOptional.get();
-	   		 List<Offer> counterOffers = offerRepository.findByParentOfferAndStatus(offer, CommonConstants.OFFER_ACTIVE);
-	   		 for(Offer temp : counterOffers) {
-	   			 try {
-					delete(temp.getId(), false);
-				} catch (Exception e) {
-					throw e;
-				}
-	   		 }
-	    	 Transactions tran = new Transactions();
-		     tran.setDestinationCurrency(offer.getDestinationCurrency());
-		     tran.setSourceCurrency(offer.getSourceCurrency());
-		     tran.setOffer(offer);
-		     tran.setSender(offer.getUser());
-		     tran.setSendingAmount(offer.getAmount());
-		     tran.setRecevingAmount(offer.getAmount() * offer.getExchangeRate() * 0.95);
-		     tran.setStatus(false);
-		     transactionsRepository.save(tran);
-		     offer.setStatus(CommonConstants.OFFER_FULFILLED);
-		     //offer.setStatus(2);
-		     offerRepository.save(offer);	
-	     }
+////		Iterator<Offer> itr = offers.iterator();
+////	     while(itr.hasNext()) {
+////	    	 Offer offer = itr.next();
+////	    	 Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(offer.getId(), CommonConstants.OFFER_ACTIVE);
+////	    	 if(!offerOptional.isPresent()) {
+////	    			throw new InvalidRequestException(" Offer is not valid.");		
+////	    	 }
+////	   		 offer = offerOptional.get();
+////	   		 List<Offer> counterOffers = offerRepository.findByParentOfferAndStatus(offer, CommonConstants.OFFER_ACTIVE);
+////	   		 for(Offer temp : counterOffers) {
+////	   			 try {
+////					delete(temp.getId(), false);
+////				} catch (Exception e) {
+////					throw e;
+////				}
+////	   		 }
+////	    	 Transactions tran = new Transactions();
+////		     tran.setDestinationCurrency(offer.getDestinationCurrency());
+////		     tran.setSourceCurrency(offer.getSourceCurrency());
+////		     tran.setOffer(offer);
+////		     tran.setSender(offer.getUser());
+////		     tran.setSendingAmount(offer.getAmount());
+////		     tran.setRecevingAmount(offer.getAmount() * offer.getExchangeRate() * 0.95);
+////		     tran.setStatus(false);
+////		     transactionsRepository.save(tran);
+////		     offer.setStatus(CommonConstants.OFFER_FULFILLED);
+////		     //offer.setStatus(2);
+////		     offerRepository.save(offer);	
+//	     }
 	     
 		return false;
 	}

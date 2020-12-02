@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.exception.InvalidRequestException;
+import com.example.demo.Exception.InvalidRequestException;
 import com.example.demo.dto.Offer;
 
 @Service
@@ -16,7 +16,7 @@ public interface OfferService {
 
 	public Offer update(Offer offer) throws Exception;
 
-	public Offer delete(Long id) throws Exception;
+	public void delete(Long id) throws Exception;
 
 	public boolean acceptOffer(Set<Offer> offers) throws InvalidRequestException, Exception;
 
@@ -26,7 +26,7 @@ public interface OfferService {
 
 	public List<Offer> findAll() throws Exception;
 
-	public List<Offer> findCounterOffers(Long id) throws Exception;
+	public HashMap<String, Object> getMatchingOffer(Long id, Long userId) throws Exception;
 
-	public HashMap<String, Object> getMatchingOffer(Long id) throws Exception;
+	public List<Offer> findCounterOffers(Long id, Long userId) throws Exception;
 }
