@@ -9,8 +9,9 @@ function BrowseOffers(props) {
   let [loading,setLoading] = React.useState(true);
 
   React.useEffect(() =>{
-    Axios.get(`${rooturl}/offer`).then(response =>{
+    Axios.get(`${rooturl}/offer/${localStorage.getItem('userId')}`).then(response =>{
       if(response.status === 200){
+        console.log(response.data);
         setLoading(false);
         setOffers(response.data);
       }
@@ -24,6 +25,11 @@ function BrowseOffers(props) {
         return <><Card>
           <Card.Body>
             <Row>
+              <Col><b>User :</b> {offer.user && offer.user.nickName}</Col>
+              <Col><b>Reputation :</b> {Math.round((Math.random() * 6 + Number.EPSILON) * 100) / 100}</Col>
+              <Col></Col>
+            </Row>
+            <Row>
               <Col><b>Amount :</b> {offer.amount}</Col>
               <Col><b>Source Country :</b> {offer.sourceCountry}</Col>
               <Col><b>Source Currency :</b> {offer.sourceCurrency}</Col>
@@ -35,7 +41,7 @@ function BrowseOffers(props) {
             </Row>
             <br/>
             <Row>
-              <Col><Link to={`/offer/${offer.id}/edit`}><Button variant='primary'>Accept</Button></Link>{' '}<Button variant='primary'>Counter Offer</Button>
+              <Col><Link to={`/browse-offers/${offer.id}/accept`}><Button variant='primary'>Accept</Button></Link>{' '}{offer.isCounterOfferAllowed  &&  <Link to={`/create-counter-offer/${offer.id}`}><Button variant='primary'>Counter Offer</Button></Link>}
               </Col>
             </Row>
           </Card.Body>

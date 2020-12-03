@@ -1,16 +1,17 @@
 import Axios from 'axios';
 import React from 'react';
-import { Button, Card, Col, Container, ListGroup, Nav, Row, Spinner, Tab } from 'react-bootstrap';
+import { Button, Card, Col, Container, Nav, Row, Spinner, Tab, ToggleButton } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { rooturl } from '../../config/config';
+import { offerStatus, rooturl } from '../../config/config';
 import MatchingOffers from './MatchingOffers';
 
 function MyOffers(props) {
   let [offers,setOffers] = React.useState([]);
   let [loading,setLoading] = React.useState(true);
   let [reload,setReload] = React.useState(false);
+  let [showSplit, setShowSplit] = React.useState(true);
   React.useEffect(() => {
-    Axios.get(`${rooturl}/offer/userId/1`,{validateStatus: false})
+    Axios.get(`${rooturl}/offer/userId/${localStorage.getItem('userId')}`,{validateStatus: false})
     .then(response => {
       if(response.status === 200){
         setOffers(response.data);
@@ -32,7 +33,23 @@ function MyOffers(props) {
 
   return loading ? <Spinner animation='border'></Spinner> : (
     <Container>
+      <Container>
       <h3>My Offers</h3>
+      <Row>
+        <Col>
+          <ToggleButton inline
+            style={{'float': 'right'}}
+            type="checkbox"
+            variant="secondary"
+            checked={showSplit}
+            value="1"
+            onChange={(e) => setShowSplit(e.currentTarget.checked)}
+          >
+            {'Show split offers'}
+          </ToggleButton>
+        </Col>
+      </Row>
+      </Container>
       <Tab.Container id="left-tabs-example" defaultActiveKey="first">
         <Row>
           <Col sm={3}>
@@ -70,13 +87,13 @@ function MyOffers(props) {
                         </Row>
                         <br/>
                         <Row>
-                          <Col><Link to={`/offer/${offer.id}/edit`}><Button variant='primary'>Edit</Button></Link>{' '}<Button variant='danger' onClick={handleDelete}>Delete</Button>
-                          </Col>
+                          {offer.status === 0 ? <Col><Link to={`/offer/${offer.id}/edit`}><Button variant='primary'>Edit</Button></Link>{' '}<Button variant='danger' onClick={handleDelete}>Delete</Button>
+                          </Col> : <Col><b>Status : </b>{offerStatus[offer.status]}</Col>}
                         </Row>
                         </Card.Body>
                       </Card>
                       <br/>
-                      <MatchingOffers id={offer.id}/>
+                      {offer.status === 0 && <MatchingOffers showSplit={showSplit} id={offer.id}/>}
                     </Tab.Pane>
                   })}
                 </Tab.Content>

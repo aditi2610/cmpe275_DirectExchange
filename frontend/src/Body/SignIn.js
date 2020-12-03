@@ -6,6 +6,7 @@ import { useDataContext } from './../App';
 import axios from 'axios';
 import { rooturl } from '../config/config';
 import { Link } from 'react-router-dom';
+import OtherSignIn from './OtherSignIn';
 
 function SignIn(props) {
 
@@ -13,6 +14,7 @@ function SignIn(props) {
   const [userLoginError, showUserLoginError] = React.useState('');
   const [userRegisterError, showUserRegisterError] = React.useState('');
   const [closeModal, setCloseModal] = React.useState(null);
+  const {data,setData} = useDataContext();
   axios.defaults.withCredentials = true;
 
   const handleClose = (e) => {
@@ -72,6 +74,7 @@ function SignIn(props) {
           localStorage.setItem("userId", response.data.id);
           localStorage.setItem("email", params.email);
           setShow(false);
+          setData({...data,logggedIn: true});
         } else {
           let errors = Object.values(response.data || { 'error': ['Something went wrong'] });
           showUserLoginError(errors.map(error => {
@@ -100,7 +103,7 @@ function SignIn(props) {
       </Modal.Header>
       <Modal.Body className="show-grid">
         <Tabs defaultActiveKey="signin">
-          <Tab eventKey="signin" title="User Sign In">
+          <Tab eventKey="signin" title="Sign In">
             <Container>
               <br />
               <Form onSubmit={handleUserSigninSubmit}>
@@ -116,12 +119,14 @@ function SignIn(props) {
                 </Form.Group>
                 <Button variant="primary" type="submit" block>
                   Sign In
-              </Button>
-                <Link to={'other-signIn'}><Button variant='primary'>Other Sign In</Button></Link>
+                </Button>
+                <br/>
+                <h4 style={{'text-align':'center'}}>OR</h4>
+                <OtherSignIn/>
               </Form>
             </Container>
           </Tab>
-          <Tab eventKey="register" title="User Register">
+          <Tab eventKey="register" title="Register">
             <Container>
               <br />
               <Form onSubmit={handleRegisterSubmit}>

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import logo from '../Logo.jpg'
 import './Header.css';
 import {FaUser, FaSignInAlt, FaSignOutAlt} from 'react-icons/fa';
+import RedirectToLogin from '../Body/RedirectToLogin';
 
 function Header(props) {
   return (
@@ -26,10 +27,12 @@ function Header(props) {
         <Nav.Item>
           <Nav.Link><Link to='/prevailing-rates'>Prevailing Rates</Link></Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link><Link to='/my-transactions'>My Transactions</Link></Nav.Link>
+        </Nav.Item>
       </Nav>
       {localStorage.getItem('email') ? (
           <NavDropdown title={<FaUser/>} id="basic-nav-dropdown">
-            <NavDropdown.Divider />
             <NavDropdown.Item href='/sign-out'>Sign out &nbsp;<FaSignOutAlt/></NavDropdown.Item>
           </NavDropdown>
       ) : (
