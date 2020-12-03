@@ -35,5 +35,5 @@ public interface IOfferService {
 
 	public boolean acceptCounterOfferFromBrosePage(Long offerId) throws Exception;
 
-	public boolean acceptOfferFromMyOffer(Long offerId1, Long offerId2);
+	public boolean acceptOfferFromMyOffer(Long offerId1, Long offerId2) throws Exception;
 }

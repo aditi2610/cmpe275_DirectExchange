@@ -16,6 +16,8 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -59,23 +61,19 @@ public class Offer {
 	
 	@JsonProperty
 	@Column(name= "isCounterOfferAllowed", nullable = false)
-	private boolean isCounterOfferAllowed;
+	private Boolean isCounterOfferAllowed = true;
 	
 	@JsonProperty
 	@Column(name= "isSplitOfferAllowed", nullable = false)
-	private boolean isSplitOfferAllowed;
+	private Boolean isSplitOfferAllowed = true;
 
 	//0 for inActive, 1 for Active , 2  for Fulfilled
 	@Column(name="status", columnDefinition = "integer default 0")
 	private int status = 0;
 	
-//	@ManyToOne
-//	private Offer parentOffer;
-//	
-	
 	@JsonProperty
     @Column(name="isCounterOffer")
-    private boolean isCounterOffer;
+    private Boolean isCounterOffer;
     
 	@ManyToOne(targetEntity = Offer.class)
     private Offer parentOffer;
@@ -85,7 +83,7 @@ public class Offer {
     
     @JsonProperty
     @Column(name="hasCounterParent", columnDefinition = "boolean default false")
-    private boolean hasMatchingOffer = false;
+    private Boolean hasMatchingOffer = false;
     
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "user", referencedColumnName = "id")
@@ -97,7 +95,7 @@ public class Offer {
 	
 	@JsonProperty
 	@Column(name="isSplitMatch", columnDefinition = "boolean default false")
-	private boolean isSplitMatch = false;
+	private Boolean isSplitMatch = false;
 	    
 	@ManyToOne( fetch = FetchType.LAZY)
 	@JoinColumn(name = "splitMatchUser", referencedColumnName = "id")
@@ -106,6 +104,7 @@ public class Offer {
 		
 	
 	@OneToMany(mappedBy = "offer")
+	@JsonIgnore
 	private Set<Transactions> transaction;
 	
 	public User getOfferAcceptor() {
@@ -148,11 +147,11 @@ public class Offer {
 		this.matchingOffer = matchingOffer;
 	}
 
-	public boolean isHasMatchingOffer() {
+	public Boolean isHasMatchingOffer() {
 		return hasMatchingOffer;
 	}
 
-	public void setHasMatchingOffer(boolean hasMatchingOffer) {
+	public void setHasMatchingOffer(Boolean hasMatchingOffer) {
 		this.hasMatchingOffer = hasMatchingOffer;
 	}
 
@@ -255,19 +254,19 @@ public class Offer {
 		this.creationDate = creationDate;
 	}
 
-	public boolean isCounterOfferAllowed() {
+	public Boolean isCounterOfferAllowed() {
 		return isCounterOfferAllowed;
 	}
 
-	public void setCounterOfferAllowed(boolean isCounterOfferAllowed) {
+	public void setCounterOfferAllowed(Boolean isCounterOfferAllowed) {
 		this.isCounterOfferAllowed = isCounterOfferAllowed;
 	}
 
-	public boolean isSplitOfferAllowed() {
+	public Boolean isSplitOfferAllowed() {
 		return isSplitOfferAllowed;
 	}
 
-	public void setSplitOfferAllowed(boolean isSplitOfferAllowed) {
+	public void setSplitOfferAllowed(Boolean isSplitOfferAllowed) {
 		this.isSplitOfferAllowed = isSplitOfferAllowed;
 	}
 
@@ -287,11 +286,11 @@ public class Offer {
 		this.parentOffer = parentOffer;
 	}
 
-	public boolean isCounterOffer() {
+	public Boolean isCounterOffer() {
 		return isCounterOffer;
 	}
 
-	public void setCounterOffer(boolean isCounterOffer) {
+	public void setCounterOffer(Boolean isCounterOffer) {
 		this.isCounterOffer = isCounterOffer;
 	}
 

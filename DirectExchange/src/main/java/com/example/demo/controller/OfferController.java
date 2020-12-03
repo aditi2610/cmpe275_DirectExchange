@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.websocket.server.PathParam;
 
@@ -194,7 +193,21 @@ public class OfferController {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
-	} 
+	}
+	
+	
+//	
+//	@RequestMapping(value="offer/get", method = RequestMethod.POST)
+//	@ResponseBody
+//	public ResponseEntity<?> getAllTransection(@PathParam("offerId1") Long offerId1, @PathParam("offerId2") Long offerId2){
+//		boolean flag;
+//		try {
+//			flag = offerService.acceptOfferFromMyOffer(offerId1,offerId2);
+//		} catch (Exception e) {
+//			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+//		}
+//		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
+//	} 
 	
 	
 }

@@ -12,4 +12,8 @@ public class CommonConstants {
 	
 	public static int OFFER_COUNTERMADE = 3;
 	
+	public static int TRANSACTION_OPEN = 0;
+	
+	public static int TRANSACTION_SUCCESS = 1;
+	
 }

@@ -23,6 +23,7 @@ import com.example.demo.dao.OfferRepository;
 import com.example.demo.dao.TransactionsRepository;
 import com.example.demo.dto.BankAccount;
 import com.example.demo.dto.Offer;
+import com.example.demo.dto.Transactions;
 import com.example.demo.dto.User;
 import com.example.demo.exception.InvalidRequestException;
 
@@ -158,6 +159,9 @@ public class OfferServiceImp implements IOfferService{
 //			counterOffer.setStatus(CommonConstants.OFFER_EXPIRED);
 //			offerRepository.save(counterOffer);
 //		}
+
+		saveTransaction(acceptedOffer, user);
+		
 		deleteAllCounterOffer(acceptedOffer);
 		acceptedOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
 		acceptedOffer.setOfferAcceptor(user);
@@ -189,6 +193,29 @@ public class OfferServiceImp implements IOfferService{
 			counterOffer.setStatus(CommonConstants.OFFER_EXPIRED);
 			offerRepository.save(counterOffer);
 		}
+
+		Transactions t1 = new Transactions(
+				acceptedCounterOffer.getParentOffer().getUser(),
+				acceptedCounterOffer.getUser(),
+				acceptedCounterOffer.getAmount(),
+				acceptedCounterOffer.getAmount()*0.95*acceptedCounterOffer.getExchangeRate(),
+				acceptedCounterOffer.getSourceCurrency(),
+				acceptedCounterOffer.getDestinationCurrency(),
+				acceptedCounterOffer.getAmount()*0.05,
+				acceptedCounterOffer);
+		Transactions t2 = new Transactions(
+				acceptedCounterOffer.getUser(),
+				acceptedCounterOffer.getParentOffer().getUser(),
+				acceptedCounterOffer.getAmount()*acceptedCounterOffer.getExchangeRate(), 
+				acceptedCounterOffer.getAmount()*0.95,
+				acceptedCounterOffer.getDestinationCurrency(),
+				acceptedCounterOffer.getSourceCurrency(),
+				acceptedCounterOffer.getAmount()*acceptedCounterOffer.getExchangeRate()*0.05,
+				acceptedCounterOffer);
+		transactionsRepository.save(t1);
+		transactionsRepository.save(t2);
+		t1.setExpirationDate(null);
+		t2.setExpirationDate(null);
 		
 		acceptedCounterOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
 		acceptedCounterOffer.setOfferAcceptor(acceptedCounterOffer.getParentOffer().getUser());
@@ -198,13 +225,53 @@ public class OfferServiceImp implements IOfferService{
 	
 	
 	@Override
-	public boolean acceptOfferFromMyOffer(Long myOffer, Long acceptedOffer) {
-		Optional<Offer> myOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(myOffer, CommonConstants.OFFER_OPEN , LocalDateTime.now());
-		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(acceptedOffer, CommonConstants.OFFER_OPEN , LocalDateTime.now());
-		if(myOfferOptional.isPresent()) {}
+	public boolean acceptOfferFromMyOffer(Long myOfferId, Long acceptedOfferId) throws Exception {
+		Optional<Offer> myOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(myOfferId, CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(acceptedOfferId, CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		if(!myOfferOptional.isPresent()) {
+			throw new InvalidRequestException("InValid Offer.");
+		}
+		if(!acceptedOfferOptional.isPresent()) {
+			throw new InvalidRequestException("InValid Offer request");
+		}	
+		Offer myOffer = myOfferOptional.get();
+		Offer acceptedOffer = acceptedOfferOptional.get();
+		deleteAllCounterOffer(myOffer);
+		deleteAllCounterOffer(acceptedOffer);
+		myOffer.setStatus(CommonConstants.OFFER_EXPIRED);
+		acceptedOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
+		acceptedOffer.setOfferAcceptor(myOffer.getUser());
+		offerRepository.save(myOffer);
+		offerRepository.save(acceptedOffer);
+		saveTransaction(acceptedOffer, myOffer.getUser());
 		return true;
 	}
 	
+	
+	public void saveTransaction(Offer acceptedOffer, User user) {
+		Transactions t1 = new Transactions(
+				acceptedOffer.getUser(),
+				user, 
+				acceptedOffer.getAmount(),
+				acceptedOffer.getAmount()*0.95*acceptedOffer.getExchangeRate(),
+				acceptedOffer.getSourceCurrency(),
+				acceptedOffer.getDestinationCurrency(),
+				acceptedOffer.getAmount()*0.05 ,
+				acceptedOffer);
+		Transactions t2 = new Transactions(
+				user,
+				acceptedOffer.getUser(),
+				acceptedOffer.getAmount()*acceptedOffer.getExchangeRate(), 
+				acceptedOffer.getAmount()*0.95,
+				acceptedOffer.getDestinationCurrency(),
+				acceptedOffer.getSourceCurrency(),
+				acceptedOffer.getAmount()*acceptedOffer.getExchangeRate()*0.05,
+				acceptedOffer);
+		t1.setExpirationDate(null);
+		t2.setExpirationDate(null);
+		transactionsRepository.save(t1);
+		transactionsRepository.save(t2);
+	}
 	@Override
 	public void delete(Long id) throws Exception {
 		Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(id, CommonConstants.OFFER_OPEN);
@@ -250,7 +317,6 @@ public class OfferServiceImp implements IOfferService{
 	public List<Offer> findCounterOffers(Long id) throws Exception{
 		 return offerRepository.findByParentOffer_IdAndStatusAndExpirationDateAfter(id, CommonConstants.OFFER_OPEN, LocalDateTime.now());	
 	}
-
 
 	@Override
 	public HashMap<String, Object> getMatchingOffer(Long id, Long userId) throws Exception {

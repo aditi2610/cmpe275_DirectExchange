@@ -70,8 +70,8 @@ public class User {
 	@Column(name= "verification_code", updatable = false)
 	private String verificationCode;
 	
-//	@OneToMany(mappedBy = "receiver")
-//	private Set<Transactions> receiverTransections; 
+	@OneToMany(mappedBy = "receiver")
+	private Set<Transactions> receiverTransections; 
 	
 	public Set<Transactions> getSenderTransections() {
 		return senderTransections;
