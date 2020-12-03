@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { rooturl } from '../../config/config';
 
 function MatchingOffers(props) {
-  let [matchingOffers, setMatchingOffers] = React.useState({exactMath: [],splitMatch: [],counterOffer:[]});
+  let [matchingOffers, setMatchingOffers] = React.useState({exactMath: [],splitMatch: [],counterOffer:[],rangeMath: []});
   let [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -17,10 +17,12 @@ function MatchingOffers(props) {
     });
   },[])
 
+  let singleMatch = [...matchingOffers.exactMath,...matchingOffers.rangeMath];
+
   return (
     <div>
       <h4>Single Offers</h4>
-      {loading ? <Spinner animation='border'></Spinner> : !matchingOffers.exactMath.length ? <div>No matching single offers</div> : matchingOffers.exactMath.map(offer => {
+      {loading ? <Spinner animation='border'></Spinner> : !singleMatch.length ? <div>No matching single offers</div> : singleMatch.map(offer => {
         return <Card>
         <Card.Body>
         <Row>
