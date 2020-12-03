@@ -63,7 +63,7 @@ public class OfferController {
 	} 
 
 	@RequestMapping(value="offer/userId/{userId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllOfffersByUser(@PathVariable("userId") Long userId){
+	public ResponseEntity<?> getAllOffersByUser(@PathVariable("userId") Long userId){
 		List<Offer> newOffer;
 		try {
 			System.out.println("Inside User Id");

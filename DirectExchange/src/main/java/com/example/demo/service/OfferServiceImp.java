@@ -14,7 +14,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
@@ -342,7 +341,7 @@ public class OfferServiceImp implements IOfferService{
 
 	@Override
 	public List<Offer> findOffersForUser(Long userId) throws Exception{
-		return offerRepository.findByUser_IdOrderByStatusAsc(userId);
+		return offerRepository.findByUser_IdAndIsCounterOfferAndExpirationDateAfterOrderByStatusAsc(userId, false, LocalDateTime.now());
 	}
 	
 	@Override
@@ -356,7 +355,7 @@ public class OfferServiceImp implements IOfferService{
 
 	@Override
 	public HashMap<String, Object> getMatchingOffer(Long id, Long userId) throws Exception {
-		Optional<Offer> offerOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(id, CommonConstants.OFFER_OPEN, LocalDateTime.now());
+		Optional<Offer> offerOptional = offerRepository.findByIdAndIsCounterOfferAndStatusAndExpirationDateAfter(id,false, CommonConstants.OFFER_OPEN, LocalDateTime.now());
 		if(!offerOptional.isPresent()) {
 			throw new InvalidRequestException("Offer with given id does not exists.");
 		}

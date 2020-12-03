@@ -11,6 +11,9 @@ import com.example.demo.dto.Offer;
 import com.example.demo.dto.User;
 
 public interface OfferRepository extends JpaRepository<Offer, Long> {
+	
+	//public Page<Offer> findAll(String sourceCurrency, double amount, String destinationCurrency, double destinationAmount, Pageable pageable);
+	
 	public Optional<Offer> findByIdAndUserAndStatus(Long offerId, User user, int active);
 
 	public List<Offer> findByParentOfferAndStatus(Offer offer, int status);
@@ -50,4 +53,10 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 	public List<Offer> findByParentOffer_IdAndStatusAndExpirationDateAfter(Long id, int status, LocalDateTime now);
 
 	public List<Offer> findByStatusAndIsCounterOfferAndExpirationDateAfterAndUser_IdNot(int status, boolean b,LocalDateTime now, Long userId);
+
+	public List<Offer> findByUser_IdAndIsCounterOfferAndExpirationDateAfterOrderByStatusAsc(Long userId, boolean b,
+			LocalDateTime now);
+
+	public Optional<Offer> findByIdAndIsCounterOfferAndStatusAndExpirationDateAfter(Long id, boolean b, int oFFER_OPEN,
+			LocalDateTime now);
 }
