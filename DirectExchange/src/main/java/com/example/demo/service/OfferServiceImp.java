@@ -201,7 +201,7 @@ public class OfferServiceImp implements IOfferService{
 	public boolean acceptOfferFromMyOffer(Long myOffer, Long acceptedOffer) {
 		Optional<Offer> myOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(myOffer, CommonConstants.OFFER_OPEN , LocalDateTime.now());
 		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(acceptedOffer, CommonConstants.OFFER_OPEN , LocalDateTime.now());
-		
+		if(myOfferOptional.isPresent()) {}
 		return true;
 	}
 	
