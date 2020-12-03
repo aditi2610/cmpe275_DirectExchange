@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.Common.CommonUtilities;
 import com.example.demo.dto.Offer;
+import com.example.demo.dto.User;
 import com.example.demo.exception.InvalidRequestException;
 import com.example.demo.service.IOfferService;
 
@@ -89,6 +90,18 @@ public class OfferController {
 		return new ResponseEntity<>(newOffer,HttpStatus.OK);
 	}
 	
+	@RequestMapping(value="offer/{userId}", method = RequestMethod.GET)
+	public ResponseEntity<?> getAllOffers(@PathVariable("userId") Long userId){
+		List<Offer> newOffer;
+		try {
+			newOffer = offerService.findAllWithoutUserOffer(userId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>(newOffer,HttpStatus.OK);
+	}
+	
 	
 	@RequestMapping(value="offer/offerId/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getOffferByID(@PathVariable("id") Long id){
@@ -145,17 +158,43 @@ public class OfferController {
 		return new ResponseEntity<>("Offer Deleted Successfully",HttpStatus.OK);
 	} 
 
-	@RequestMapping(value="offer/accept", method = RequestMethod.POST)
+	@RequestMapping(value="offer/acceptOfferFromBrosePage", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> acceptOffer(@RequestBody Set<Offer> offers){
+	public ResponseEntity<?> acceptOfferFromBrosePage(@PathParam("offerId") Long offerId, @RequestBody User user){
 		boolean flag;
 		try {
-			flag = offerService.acceptOffer(offers);
+			flag = offerService.acceptOfferFromBrosePage(offerId,user);
 		} catch (Exception e) {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
 	} 
-
+	
+	
+	@RequestMapping(value="offer/acceptCounterOfferFromBrosePage", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> acceptCounterOfferFromBrosePage(@PathParam("offerId") Long offerId){
+		boolean flag;
+		try {
+			flag = offerService.acceptCounterOfferFromBrosePage(offerId);
+		} catch (Exception e) {
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
+	} 
+	
+	
+	@RequestMapping(value="offer/acceptOfferFromMyOffer", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> acceptOfferFromMyOffer(@PathParam("offerId1") Long offerId1, @PathParam("offerId2") Long offerId2){
+		boolean flag;
+		try {
+			flag = offerService.acceptOfferFromMyOffer(offerId1,offerId2);
+		} catch (Exception e) {
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
+	} 
+	
 	
 }
