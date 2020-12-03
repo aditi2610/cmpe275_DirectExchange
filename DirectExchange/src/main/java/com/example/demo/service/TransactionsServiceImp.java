@@ -24,7 +24,7 @@ public class TransactionsServiceImp implements ITransactionsService {
 	@Override
 	public List<Transactions> getAllTransaction(Long userId) {
 		
-		return transactionsRepository.findBySender_IdAndExpirationDateAfterAndStatus(userId, LocalDateTime.now(), CommonConstants.TRANSACTION_OPEN);
+		return transactionsRepository.findBySender_Id(userId);
 	}
 
 	@Override

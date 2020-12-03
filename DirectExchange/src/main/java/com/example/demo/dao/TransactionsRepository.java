@@ -12,9 +12,10 @@ import com.example.demo.dto.Transactions;
 
 @Repository
 public interface TransactionsRepository extends JpaRepository<Transactions, Long>{
-	List<Transactions> findBySender_IdAndExpirationDateAfterAndStatus(Long userId, LocalDateTime now, int status);
-
+	
 	Optional<Transactions> findByIdAndExpirationDateAfterAndStatus(Long id, LocalDateTime now, int status);
 
 	List<Transactions> findByOfferAndStatus(Offer offer, int status);
+
+	List<Transactions> findBySender_Id(Long userId);
 }

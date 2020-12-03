@@ -9,12 +9,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Common.CommonConstants;
@@ -39,6 +48,9 @@ public class OfferServiceImp implements IOfferService{
 	
 	@Autowired
 	private TransactionsRepository transactionsRepository;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Override
 	public Offer add(Offer offer) throws InvalidRequestException{
@@ -51,13 +63,6 @@ public class OfferServiceImp implements IOfferService{
 		if(!offer.getIsCounterOffer()) {
 			if(offer.getDestinationCurrency().equals(offer.getSourceCurrency())) {
 				throw new InvalidRequestException(" Source and destination Currency should not be same.");	
-			}
-			if(!checkDestinationBankAccountExists(user, offer.getSourceCurrency(), "Send")) {
-				throw new InvalidRequestException("User does not have source account with required permission");		
-			}
-			
-			if(!checkDestinationBankAccountExists(user, offer.getDestinationCurrency(), "Receive")) {
-				throw new InvalidRequestException("User does not have destination account with required permission");			
 			}
 		
 		} else {
@@ -90,6 +95,13 @@ public class OfferServiceImp implements IOfferService{
 				offerRepository.save(counterModeOffer.get());				
 			}
 		}
+		if(!checkDestinationBankAccountExists(user, offer.getSourceCurrency(), "Send")) {
+			throw new InvalidRequestException("User does not have source account with required permission");		
+		}
+		
+		if(!checkDestinationBankAccountExists(user, offer.getDestinationCurrency(), "Receive")) {
+			throw new InvalidRequestException("User does not have destination account with required permission");			
+		}
 		return offerRepository.save(offer);
 	}
 
@@ -107,6 +119,30 @@ public class OfferServiceImp implements IOfferService{
 		List<Offer> allOffers = offerRepository.findByStatusAndIsCounterOfferAndExpirationDateAfter(CommonConstants.OFFER_OPEN, false, LocalDateTime.now());
 		return allOffers;
 	}
+	
+	
+	//TODO:
+	public Page<Offer> findAllWithFiltering(String sourceCurrency, double amount, String destinationCurrency, double destinationAmount, int page, int size) throws Exception{
+		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Offer> criteriaQuery = criteriaBuilder.createQuery(Offer.class);
+		Root<Offer> offerRoot = criteriaQuery.from(Offer.class);
+		Predicate predicatesourceCurrency = criteriaBuilder.equal(offerRoot.get("sourceCurrency"), sourceCurrency);
+		Predicate predicateamount = criteriaBuilder.equal(offerRoot.get("amount"), amount);
+		Predicate predicatedestinationCurrency = criteriaBuilder.equal(offerRoot.get("destinationCurrency"), destinationCurrency);
+		Predicate predicatedestinationAmount = criteriaBuilder.equal(offerRoot.get("destinationAmount"), destinationAmount);
+		CriteriaQuery<Offer> select = criteriaQuery.select(offerRoot);
+//		if(sourceCurrency != null && !sourceCurrency.isEmpty()) {
+//			 ParameterExpression<String> p = criteriaBuilder.parameter(String.class);
+//			  q.where(criteriaBuilder.equal(offerRoot.get("sourceCurrency"), p));
+//		}
+		TypedQuery<Offer> typedQuery = entityManager.createQuery(select);
+		typedQuery.setFirstResult(0);
+		typedQuery.setMaxResults(size);
+		List<Offer> fooList = typedQuery.getResultList();
+		
+		return null;
+	}
+	
 	
 	@Override
 	public List<Offer> findAllWithoutUserOffer(Long userId) {
@@ -145,7 +181,17 @@ public class OfferServiceImp implements IOfferService{
 		if(!acceptedOfferOptional.isPresent()) {
 			throw new InvalidRequestException("Offer does not exists or is no longer in Open state.");				
 		}
+		
 		Offer acceptedOffer = acceptedOfferOptional.get();
+		
+		if(!checkDestinationBankAccountExists(user, acceptedOffer.getDestinationCurrency(), "Send")) {
+			throw new InvalidRequestException("User does not have source account with required permission");		
+		}
+		
+		if(!checkDestinationBankAccountExists(user, acceptedOffer.getSourceCurrency(), "Receive")) {
+			throw new InvalidRequestException("User does not have destination account with required permission");			
+		}
+		
 		if(acceptedOffer.getUser().equals(user)) {
 			throw new InvalidRequestException(" Offer Creator and acceptor cannot be the same person");				
 		}
@@ -168,6 +214,7 @@ public class OfferServiceImp implements IOfferService{
 		if(acceptedCounterOffer.getUser().equals(acceptedCounterOffer.getParentOffer().getUser())) {
 			throw new InvalidRequestException("Offer Creator and acceptor cannot be the same person");				
 		}
+				
 		List<Offer> counterOffers = findCounterOffers(acceptedCounterOffer.getParentOffer().getId()); 
 		for(Offer counterOffer:counterOffers) {
 			if(counterOffer.getHasMatchingOffer()) {
