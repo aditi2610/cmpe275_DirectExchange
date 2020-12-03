@@ -15,12 +15,12 @@ function PostNewOffer(props) {
       "amount" :parseInt(form.amount.value),
       "destinationCountry" :form.destinationCountry.value,
       "destinationCurrency" :form.destinationCurrency.value,
-      "exchangeRate" :parseInt(form.exchangeRate.value),
-      "expirationDate" :form.expirationDate.value,
+      "exchangeRate" :parseFloat(form.exchangeRate.value),
+      "expirationDate" :new Date(form.expirationDate.value).toISOString(),
       "isCounterOfferAllowed" :form.isCounterOfferAllowed.checked,
       "isSplitOfferAllowed" :form.isSplitOfferAllowed.checked,
       "user": {
-          "id" :1,
+          "id" :parseInt(localStorage.getItem('userId')),
           "isVerified" :true,
       }
     }
@@ -117,7 +117,7 @@ function PostNewOffer(props) {
                 Exchange Rate
               </Form.Label>
               <Col sm="9">
-                <Form.Control required name="exchangeRate" type="number" step="0.01" placeholder="Exchange Rate" />
+                <Form.Control required name="exchangeRate" type="number" step="0.001" placeholder="Exchange Rate" min="0.001" />
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
@@ -133,7 +133,7 @@ function PostNewOffer(props) {
                 Counter Offer
               </Form.Label>
               <Col sm="9">
-                <Form.Check style={{"float":"left"}} type="checkbox" name="isCounterOfferAllowed" label='Allow'/>
+                <Form.Check style={{"float":"left"}} type="checkbox" name="isCounterOfferAllowed" label='Allow' defaultChecked={true}/>
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
@@ -141,7 +141,7 @@ function PostNewOffer(props) {
                 Split Offer
               </Form.Label>
               <Col sm="9">
-                <Form.Check style={{"float":"left"}}type="checkbox" name="isSplitOfferAllowed" label='Allow'/>
+                <Form.Check style={{"float":"left"}}type="checkbox" name="isSplitOfferAllowed" label='Allow' defaultChecked={true}/>
               </Col>
             </Form.Group>
             <Col>

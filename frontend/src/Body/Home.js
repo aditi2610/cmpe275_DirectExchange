@@ -1,9 +1,11 @@
 import React from 'react';
+import RedirectToLogin from './RedirectToLogin';
 
 function Home(props) {
   return (
     <div>
-      This is a home page
+      <RedirectToLogin/>
+      <h4>Welcome to DirectExchange, Browse offers or Post one!</h4>
     </div>
   );
 }

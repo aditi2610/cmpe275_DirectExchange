@@ -13,22 +13,23 @@ function EditOffer(props) {
     e.preventDefault();
     let form = e.target;
     let formData = {
+      "id":parseInt(id),
       "sourceCountry" :form.sourceCountry.value,
       "sourceCurrency" :form.sourceCurrency.value,
       "amount" :parseInt(form.amount.value),
       "destinationCountry" :form.destinationCountry.value,
       "destinationCurrency" :form.destinationCurrency.value,
-      "exchangeRate" :parseInt(form.exchangeRate.value),
-      "expirationDate" :form.expirationDate.value,
+      "exchangeRate" :parseFloat(form.exchangeRate.value),
+      "expirationDate" :new Date(form.expirationDate.value).toISOString(),
       "isCounterOfferAllowed" :form.isCounterOfferAllowed.checked,
       "isSplitOfferAllowed" :form.isSplitOfferAllowed.checked,
       "user": {
-          "id" :1,
+          "id" :parseInt(localStorage.getItem('userId')),
           "isVerified" :true,
       }
     }
     console.log(formData);
-    Axios.post(`${rooturl}/offer`,formData,{validateStatus: false})
+    Axios.put(`${rooturl}/offer`,formData,{validateStatus: false})
     .then(response => {
       if(response.status === 201){
         form.reset();
@@ -131,7 +132,7 @@ function EditOffer(props) {
                 Exchange Rate
               </Form.Label>
               <Col sm="9">
-                <Form.Control required name="exchangeRate" type="number" step="0.01" placeholder="Exchange Rate" defaultValue={offer.exchangeRate}/>
+                <Form.Control required name="exchangeRate" type="number" step="0.001" placeholder="Exchange Rate" defaultValue={offer.exchangeRate}/>
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
