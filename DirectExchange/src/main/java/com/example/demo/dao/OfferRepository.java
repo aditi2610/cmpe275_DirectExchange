@@ -47,5 +47,7 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 
 	public Optional<Offer> findByIdAndUserAndExpirationDateAfterAndStatus(Long id, User user, LocalDateTime now,int status);
 
-	public List<Offer> findByParentOffer_IdAndStatusAndExpirationDateAfter(Long id, int oFFER_OPEN, LocalDateTime now);
+	public List<Offer> findByParentOffer_IdAndStatusAndExpirationDateAfter(Long id, int status, LocalDateTime now);
+
+	public List<Offer> findByStatusAndIsCounterOfferAndExpirationDateAfterAndUser_IdNot(int status, boolean b,LocalDateTime now, Long userId);
 }

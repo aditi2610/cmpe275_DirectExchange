@@ -64,6 +64,9 @@ public class OfferServiceImp implements IOfferService{
 			if(!temp.isPresent()) {
 				throw new InvalidRequestException("InValid Request. Offer you want to counter no longer exists.");
 			}
+			if(!temp.get().isCounterOfferAllowed()) {
+				throw new InvalidRequestException("InValid Request. Counter Offer is not allowed for this offer.");
+			}
 			offer.setExpirationDate(offer.getExpirationDate());
 			offer.setSourceCountry(temp.get().getSourceCountry());
 			offer.setDestinationCountry(temp.get().getDestinationCountry());
@@ -105,6 +108,12 @@ public class OfferServiceImp implements IOfferService{
 	}
 	
 	@Override
+	public List<Offer> findAllWithoutUserOffer(Long userId) {
+		List<Offer> allOffers = offerRepository.findByStatusAndIsCounterOfferAndExpirationDateAfterAndUser_IdNot(CommonConstants.OFFER_OPEN, false, LocalDateTime.now(), userId);
+		return allOffers;
+	}
+	
+	@Override
 	public Offer update(Offer offer) throws Exception {
 		User user = offer.getUser();
 		Optional<Offer> offerToBeUpdated = offerRepository.findByIdAndUserAndExpirationDateAfterAndStatus(offer.getId(), user,  LocalDateTime.now(),CommonConstants.OFFER_OPEN);
@@ -130,18 +139,81 @@ public class OfferServiceImp implements IOfferService{
 	}
 
 	@Override
-	public void delete(Long id) throws Exception {
-		 delete(id,true);
+	public boolean acceptOfferFromBrosePage(Long id,User user) throws Exception{
+		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(id, CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		if(!acceptedOfferOptional.isPresent()) {
+			throw new InvalidRequestException("Offer does not exists.");				
+		}
+		Offer acceptedOffer = acceptedOfferOptional.get();
+		if(acceptedOffer.getUser().equals(user)) {
+			throw new InvalidRequestException(" Offer Creator and acceptor cannot be the same person");				
+		}
+//		List<Offer> counterOffers = findCounterOffers(acceptedOffer.getId()); 
+//		for(Offer counterOffer:counterOffers) {
+//			if(counterOffer.isHasMatchingOffer()) {
+//				Optional<Offer> matchedOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(counterOffer.getMatchingOffer().getId(), CommonConstants.OFFER_COUNTERMADE, LocalDateTime.now());
+//				matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);	
+//				offerRepository.save(matchedOffer.get());
+//			}
+//			counterOffer.setStatus(CommonConstants.OFFER_EXPIRED);
+//			offerRepository.save(counterOffer);
+//		}
+		deleteAllCounterOffer(acceptedOffer);
+		acceptedOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
+		acceptedOffer.setOfferAcceptor(user);
+		offerRepository.save(acceptedOffer);
+		return true;
 	}
 	
-	public void delete(Long id, boolean flag) throws Exception {
+	@Override
+	public boolean acceptCounterOfferFromBrosePage(Long offerId) throws Exception{
+		Optional<Offer> acceptedCounterOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offerId, CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		if(!acceptedCounterOfferOptional.isPresent()) {
+			throw new InvalidRequestException("Offer does not exists.");				
+		}
+		Offer acceptedCounterOffer = acceptedCounterOfferOptional.get();
+		if(acceptedCounterOffer.getUser().equals(acceptedCounterOffer.getParentOffer().getUser())) {
+			throw new InvalidRequestException("Offer Creator and acceptor cannot be the same person");				
+		}
+		List<Offer> counterOffers = findCounterOffers(acceptedCounterOffer.getParentOffer().getId()); 
+		for(Offer counterOffer:counterOffers) {
+			if(counterOffer.isHasMatchingOffer()) {
+				Optional<Offer> matchedOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(counterOffer.getMatchingOffer().getId(), CommonConstants.OFFER_COUNTERMADE, LocalDateTime.now());
+				if(counterOffer.getId() == acceptedCounterOffer.getId())
+					matchedOffer.get().setStatus(CommonConstants.OFFER_EXPIRED);
+				else
+					matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);
+				offerRepository.save(matchedOffer.get());
+			}
+			if(counterOffer.getId() == acceptedCounterOffer.getId()) continue;
+			counterOffer.setStatus(CommonConstants.OFFER_EXPIRED);
+			offerRepository.save(counterOffer);
+		}
+		
+		acceptedCounterOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
+		acceptedCounterOffer.setOfferAcceptor(acceptedCounterOffer.getParentOffer().getUser());
+		offerRepository.save(acceptedCounterOffer);
+		return true;
+	}
+	
+	
+	@Override
+	public boolean acceptOfferFromMyOffer(Long myOffer, Long acceptedOffer) {
+		Optional<Offer> myOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(myOffer, CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(acceptedOffer, CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		
+		return true;
+	}
+	
+	@Override
+	public void delete(Long id) throws Exception {
 		Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(id, CommonConstants.OFFER_OPEN);
 		if(!offerOptional.isPresent()) {
 			throw new InvalidRequestException("Offer with given id does not exists.");		
 		}
 		Offer offerToBeDeleted = offerOptional.get();
 		if(offerToBeDeleted.isCounterOffer()) {
-			deleteCounterOffer(offerToBeDeleted, flag);
+			deleteCounterOffer(offerToBeDeleted);
 		}else {
 			deleteAllCounterOffer(offerToBeDeleted);	
 			offerToBeDeleted.setStatus(CommonConstants.OFFER_EXPIRED);
@@ -149,14 +221,10 @@ public class OfferServiceImp implements IOfferService{
 		}
 	}
 	
-	private void deleteCounterOffer(Offer offer, boolean flag) {
+	private void deleteCounterOffer(Offer offer) {
 		if(offer.isHasMatchingOffer()) {
-			Optional<Offer> matchedOffer = offerRepository.findById(offer.getMatchingOffer().getId());
-			if(flag) 
-				matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);
-			else
-				matchedOffer.get().setStatus(CommonConstants.OFFER_EXPIRED);
-				
+			Optional<Offer> matchedOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getMatchingOffer().getId(), CommonConstants.OFFER_COUNTERMADE, LocalDateTime.now());		
+			matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);
 			offerRepository.save(matchedOffer.get());
 		}
 		offer.setStatus(CommonConstants.OFFER_EXPIRED);
@@ -165,7 +233,7 @@ public class OfferServiceImp implements IOfferService{
 	private void deleteAllCounterOffer(Offer offerToBeDeleted) throws Exception {
 		List<Offer> counterOffers = findCounterOffers(offerToBeDeleted.getId()); 
 		for(Offer counterOffer:counterOffers) {
-			deleteCounterOffer(counterOffer,true);
+			deleteCounterOffer(counterOffer);
 		}
 	}
 
@@ -251,43 +319,6 @@ public class OfferServiceImp implements IOfferService{
 			}
 		}		
 	}
-
-	//Can have Transaction Object.
-	@Override
-	public boolean acceptOffer(Set<Offer> offers) throws Exception {
-		
-//		Iterator<Offer> itr = offers.iterator();
-//	     while(itr.hasNext()) {
-//	    	 Offer offer = itr.next();
-//	    	 Optional<Offer> offerOptional = offerRepository.findByIdAndStatus(offer.getId(), CommonConstants.OFFER_ACTIVE);
-//	    	 if(!offerOptional.isPresent()) {
-//	    			throw new InvalidRequestException(" Offer is not valid.");		
-//	    	 }
-//	   		 offer = offerOptional.get();
-//	   		 List<Offer> counterOffers = offerRepository.findByParentOfferAndStatus(offer, CommonConstants.OFFER_ACTIVE);
-//	   		 for(Offer temp : counterOffers) {
-//	   			 try {
-//					delete(temp.getId(), false);
-//				} catch (Exception e) {
-//					throw e;
-//				}
-//	   		 }
-//	    	 Transactions tran = new Transactions();
-//		     tran.setDestinationCurrency(offer.getDestinationCurrency());
-//		     tran.setSourceCurrency(offer.getSourceCurrency());
-//		     tran.setOffer(offer);
-//		     tran.setSender(offer.getUser());
-//		     tran.setSendingAmount(offer.getAmount());
-//		     tran.setRecevingAmount(offer.getAmount() * offer.getExchangeRate() * 0.95);
-//		     tran.setStatus(false);
-//		     transactionsRepository.save(tran);
-//		     offer.setStatus(CommonConstants.OFFER_FULFILLED);
-//		     //offer.setStatus(2);
-//		     offerRepository.save(offer);	
-	//     }
-	     
-		return false;
-	}
 	
 	public boolean checkDestinationBankAccountExists(User user, String destimationCurrency, String type){
 		Set<BankAccount> destinationAccounts= bankRepository.findByUserAndPrimaryCurrency(user, destimationCurrency);
@@ -317,4 +348,5 @@ public class OfferServiceImp implements IOfferService{
 	    String[] result = new String[emptyNames.size()];
 	    return emptyNames.toArray(result);
 	}
+
 }

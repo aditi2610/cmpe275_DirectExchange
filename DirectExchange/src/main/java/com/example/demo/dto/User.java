@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -60,6 +61,8 @@ public class User {
 	@OneToMany(mappedBy = "receiver")
 	private Set<Message> receiverMsg; 
 	
+	@OneToOne(mappedBy = "offerAcceptor")
+	private Offer acceptedOffer;
 	
 	@OneToMany(mappedBy = "sender")
 	private Set<Transactions> senderTransections; 
@@ -89,6 +92,13 @@ public class User {
 	
 	}	
 
+	public Offer getAcceptedOffer() {
+		return acceptedOffer;
+	}
+
+	public void setAcceptedOffer(Offer acceptedOffer) {
+		this.acceptedOffer = acceptedOffer;
+	}
 	
 	public String getFirstName() {	
 		return firstName;	

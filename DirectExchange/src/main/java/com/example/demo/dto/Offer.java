@@ -1,9 +1,7 @@
 package com.example.demo.dto;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,11 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.DynamicUpdate;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -74,12 +72,13 @@ public class Offer {
 //	@ManyToOne
 //	private Offer parentOffer;
 //	
-	@ManyToOne(targetEntity = Offer.class)
-    private Offer parentOffer;
-    
+	
 	@JsonProperty
     @Column(name="isCounterOffer")
     private boolean isCounterOffer;
+    
+	@ManyToOne(targetEntity = Offer.class)
+    private Offer parentOffer;
     
     @ManyToOne(targetEntity = Offer.class)
     private Offer matchingOffer;
@@ -93,9 +92,46 @@ public class Offer {
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
+	@OneToOne
+	private User offerAcceptor;
+	
+	@JsonProperty
+	@Column(name="isSplitMatch", columnDefinition = "boolean default false")
+	private boolean isSplitMatch = false;
+	    
+	@ManyToOne( fetch = FetchType.LAZY)
+	@JoinColumn(name = "splitMatchUser", referencedColumnName = "id")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private User splitMatchedUser;
+		
+	
 	@OneToMany(mappedBy = "offer")
 	private Set<Transactions> transaction;
 	
+	public User getOfferAcceptor() {
+		return offerAcceptor;
+	}
+
+	public void setOfferAcceptor(User offerAcceptor) {
+		this.offerAcceptor = offerAcceptor;
+	}
+
+	public boolean isSplitMatch() {
+		return isSplitMatch;
+	}
+
+	public void setSplitMatch(boolean isSplitMatch) {
+		this.isSplitMatch = isSplitMatch;
+	}
+
+	public User getSplitMatchedUser() {
+		return splitMatchedUser;
+	}
+
+	public void setSplitMatchedUser(User splitMatchedUser) {
+		this.splitMatchedUser = splitMatchedUser;
+	}
+
 	public Double getDestinationAmount() {
 		return destinationAmount;
 	}
