@@ -186,10 +186,10 @@ public class OfferController {
 	
 	@RequestMapping(value="offer/acceptOfferFromMyOffer", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<?> acceptOfferFromMyOffer(@PathParam("offerId1") Long offerId1, @PathParam("offerId2") Long offerId2){
+	public ResponseEntity<?> acceptOfferFromMyOffer(@PathParam("myOfferId") Long myOfferId, @PathParam("acceptedOfferId") Long acceptedOfferId){
 		boolean flag;
 		try {
-			flag = offerService.acceptOfferFromMyOffer(offerId1,offerId2);
+			flag = offerService.acceptOfferFromMyOffer(myOfferId,acceptedOfferId);
 		} catch (Exception e) {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}

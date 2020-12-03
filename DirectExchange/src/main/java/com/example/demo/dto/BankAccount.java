@@ -145,7 +145,7 @@ public class BankAccount {
 	public void setId(long id) {
 		this.id = id;
 	}
-	@JsonIgnoreProperties({"accounts", "offers"})
+	@JsonIgnoreProperties({"accounts", "offers","acceptedOffer"})
 	public User getUser() {
 		return user;
 	}

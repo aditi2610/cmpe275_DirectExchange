@@ -143,23 +143,12 @@ public class OfferServiceImp implements IOfferService{
 	public boolean acceptOfferFromBrosePage(Long id,User user) throws Exception{
 		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(id, CommonConstants.OFFER_OPEN , LocalDateTime.now());
 		if(!acceptedOfferOptional.isPresent()) {
-			throw new InvalidRequestException("Offer does not exists.");				
+			throw new InvalidRequestException("Offer does not exists or is no longer in Open state.");				
 		}
 		Offer acceptedOffer = acceptedOfferOptional.get();
 		if(acceptedOffer.getUser().equals(user)) {
 			throw new InvalidRequestException(" Offer Creator and acceptor cannot be the same person");				
 		}
-//		List<Offer> counterOffers = findCounterOffers(acceptedOffer.getId()); 
-//		for(Offer counterOffer:counterOffers) {
-//			if(counterOffer.isHasMatchingOffer()) {
-//				Optional<Offer> matchedOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(counterOffer.getMatchingOffer().getId(), CommonConstants.OFFER_COUNTERMADE, LocalDateTime.now());
-//				matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);	
-//				offerRepository.save(matchedOffer.get());
-//			}
-//			counterOffer.setStatus(CommonConstants.OFFER_EXPIRED);
-//			offerRepository.save(counterOffer);
-//		}
-
 		saveTransaction(acceptedOffer, user);
 		
 		deleteAllCounterOffer(acceptedOffer);
@@ -330,7 +319,7 @@ public class OfferServiceImp implements IOfferService{
 		double amount = offer.getAmount() * offer.getExchangeRate();
 		List<Offer> exactMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndDestinationAmountAndStatusAndIsCounterOfferAndUser_IdNotAndExpirationDateAfter(offer.getDestinationCurrency(), offer.getSourceCurrency(), offer.getAmount() , CommonConstants.OFFER_OPEN, false,userId, LocalDateTime.now());
 		map.put("exactMath", exactMatch);
-		List<Offer> rangeMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndDestinationAmountBetweenAndIsCounterOfferAndDestinationAmountNotAndUser_IdNotAndExpirationDateAfterOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, offer.getAmount()*0.90, offer.getAmount() *1.10, false, amount, userId, LocalDateTime.now());
+		List<Offer> rangeMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndDestinationAmountBetweenAndIsCounterOfferAndDestinationAmountNotAndUser_IdNotAndExpirationDateAfterOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, offer.getAmount()*0.90, offer.getAmount() *1.10, false, offer.getAmount(), userId, LocalDateTime.now());
 		map.put("rangeMath", rangeMatch);
 		if(offer.isSplitOfferAllowed()) {
 			List<Offer> forSplitMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndUser_IdNotAndExpirationDateAfterOrderByDestinationAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, false, userId, LocalDateTime.now());

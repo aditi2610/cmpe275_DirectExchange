@@ -95,7 +95,7 @@ public class Offer {
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User offerAcceptor;
 	
@@ -112,7 +112,7 @@ public class Offer {
 	@OneToMany(mappedBy = "offer")
 	private Set<Transactions> transaction;
 	
-	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections"})
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections","acceptedOffer"})
 	public User getOfferAcceptor() {
 		return offerAcceptor;
 	}
@@ -181,7 +181,7 @@ public class Offer {
 		this.status = status;
 	}
 
-	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections"})
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections","acceptedOffer"})
 	public User getUser() {
 		return user;
 	}

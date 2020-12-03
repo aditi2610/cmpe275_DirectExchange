@@ -77,7 +77,7 @@ public class Transactions {
 	
 
 
-	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections"})
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections","acceptedOffer"})
 	public User getSender() {
 		return sender;
 	}
@@ -107,6 +107,8 @@ public class Transactions {
 	}
 	
 	Transactions(){}
+	
+	@JsonIgnoreProperties({"transaction", "offerAcceptor", "user", "parentOffer","matchingOffer"})
 	public Offer getOffer() {
 		return offer;
 	}
@@ -163,6 +165,7 @@ public class Transactions {
 		this.status = status;
 	}
 
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections","acceptedOffer"})
 	public User getReceiver() {
 		return receiver;
 	}

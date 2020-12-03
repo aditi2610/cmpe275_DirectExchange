@@ -61,8 +61,8 @@ public class User {
 	@OneToMany(mappedBy = "receiver")
 	private Set<Message> receiverMsg; 
 	
-	@OneToOne(mappedBy = "offerAcceptor")
-	private Offer acceptedOffer;
+	@OneToMany(mappedBy = "offerAcceptor")
+	private Set<Offer> acceptedOffer;
 
 	@OneToMany(mappedBy = "sender")
 	private Set<Transactions> senderTransections; 
@@ -86,18 +86,24 @@ public class User {
 	 this.password = password;	
 	 this.isVerified = false;
 	}	
-
-	public Offer getAcceptedOffer() {
-		return acceptedOffer;
-	}
-
-	public void setAcceptedOffer(Offer acceptedOffer) {
-		this.acceptedOffer = acceptedOffer;
-	}
+//
+//	public Offer getAcceptedOffer() {
+//		return acceptedOffer;
+//	}
+//
+//	public void setAcceptedOffer(Offer acceptedOffer) {
+//		this.acceptedOffer = acceptedOffer;
+//	}
 	
 	public String getFirstName() {	
 		return firstName;	
 	}	
+	public Set<Offer> getAcceptedOffer() {
+		return acceptedOffer;
+	}
+	public void setAcceptedOffer(Set<Offer> acceptedOffer) {
+		this.acceptedOffer = acceptedOffer;
+	}
 	public void setFirstName(String firstName) {	
 		this.firstName = firstName;	
 	}	
