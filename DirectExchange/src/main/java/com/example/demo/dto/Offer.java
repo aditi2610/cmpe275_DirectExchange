@@ -121,14 +121,6 @@ public class Offer {
 		this.offerAcceptor = offerAcceptor;
 	}
 
-	public boolean isSplitMatch() {
-		return isSplitMatch;
-	}
-
-	public void setSplitMatch(boolean isSplitMatch) {
-		this.isSplitMatch = isSplitMatch;
-	}
-
 	public User getSplitMatchedUser() {
 		return splitMatchedUser;
 	}
@@ -153,13 +145,6 @@ public class Offer {
 		this.matchingOffer = matchingOffer;
 	}
 
-	public Boolean isHasMatchingOffer() {
-		return hasMatchingOffer;
-	}
-
-	public void setHasMatchingOffer(Boolean hasMatchingOffer) {
-		this.hasMatchingOffer = hasMatchingOffer;
-	}
 
 	public long getOfferId() {
 		return id;
@@ -261,21 +246,6 @@ public class Offer {
 		this.creationDate = creationDate;
 	}
 
-	public Boolean isCounterOfferAllowed() {
-		return isCounterOfferAllowed;
-	}
-
-	public void setCounterOfferAllowed(Boolean isCounterOfferAllowed) {
-		this.isCounterOfferAllowed = isCounterOfferAllowed;
-	}
-
-	public Boolean isSplitOfferAllowed() {
-		return isSplitOfferAllowed;
-	}
-
-	public void setSplitOfferAllowed(Boolean isSplitOfferAllowed) {
-		this.isSplitOfferAllowed = isSplitOfferAllowed;
-	}
 
 	public Set<Transactions> getTransaction() {
 		return transaction;
@@ -293,12 +263,44 @@ public class Offer {
 		this.parentOffer = parentOffer;
 	}
 
-	public Boolean isCounterOffer() {
+	public Boolean getIsCounterOfferAllowed() {
+		return isCounterOfferAllowed;
+	}
+
+	public void setIsCounterOfferAllowed(Boolean isCounterOfferAllowed) {
+		this.isCounterOfferAllowed = isCounterOfferAllowed;
+	}
+
+	public Boolean getIsSplitOfferAllowed() {
+		return isSplitOfferAllowed;
+	}
+
+	public void setIsSplitOfferAllowed(Boolean isSplitOfferAllowed) {
+		this.isSplitOfferAllowed = isSplitOfferAllowed;
+	}
+
+	public Boolean getIsCounterOffer() {
 		return isCounterOffer;
 	}
 
-	public void setCounterOffer(Boolean isCounterOffer) {
+	public void setIsCounterOffer(Boolean isCounterOffer) {
 		this.isCounterOffer = isCounterOffer;
+	}
+
+	public Boolean getHasMatchingOffer() {
+		return hasMatchingOffer;
+	}
+
+	public void setHasMatchingOffer(Boolean hasMatchingOffer) {
+		this.hasMatchingOffer = hasMatchingOffer;
+	}
+
+	public Boolean getIsSplitMatch() {
+		return isSplitMatch;
+	}
+
+	public void setIsSplitMatch(Boolean isSplitMatch) {
+		this.isSplitMatch = isSplitMatch;
 	}
 
 	@Override

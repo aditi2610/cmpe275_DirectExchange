@@ -48,7 +48,7 @@ public class OfferServiceImp implements IOfferService{
 		}
 	
 		offer.setDestinationAmount(offer.getAmount() * offer.getExchangeRate());
-		if(!offer.isCounterOffer()) {
+		if(!offer.getIsCounterOffer()) {
 			if(offer.getDestinationCurrency().equals(offer.getSourceCurrency())) {
 				throw new InvalidRequestException(" Source and destination Currency should not be same.");	
 			}
@@ -65,7 +65,7 @@ public class OfferServiceImp implements IOfferService{
 			if(!temp.isPresent()) {
 				throw new InvalidRequestException("InValid Request. Offer you want to counter no longer exists.");
 			}
-			if(!temp.get().isCounterOfferAllowed()) {
+			if(!temp.get().getIsCounterOfferAllowed()) {
 				throw new InvalidRequestException("InValid Request. Counter Offer is not allowed for this offer.");
 			}
 			offer.setExpirationDate(offer.getExpirationDate());
@@ -73,14 +73,14 @@ public class OfferServiceImp implements IOfferService{
 			offer.setDestinationCountry(temp.get().getDestinationCountry());
 			offer.setSourceCurrency(temp.get().getSourceCurrency());
 			offer.setDestinationCurrency(temp.get().getDestinationCurrency());
-			offer.setSplitOfferAllowed(false);
-			offer.setCounterOfferAllowed(false);
+			offer.setIsSplitOfferAllowed(false);
+			offer.setIsCounterOfferAllowed(false);
 			double lowerLimit = temp.get().getAmount() * 0.90;
 			double upperLimit = temp.get().getAmount()  * 1.10; 
 			if(offer.getAmount() < lowerLimit || offer.getAmount() > upperLimit) {
 				throw new InvalidRequestException("InValid Request for counter offer. Amount exceeds 10% lower or upper bound");						
 			}
-			if(offer.isHasMatchingOffer()) {
+			if(offer.getHasMatchingOffer()) {
 				Optional<Offer> counterModeOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getMatchingOffer().getId(), CommonConstants.OFFER_OPEN, LocalDateTime.now());
 				if(!counterModeOffer.isPresent()) {
 					throw new InvalidRequestException("InValid Request. Offer you want to counter no longer exists.");
@@ -121,7 +121,7 @@ public class OfferServiceImp implements IOfferService{
 		if(!offerToBeUpdated.isPresent()) {
 			throw new InvalidRequestException("Invalid Request.Either this offer not exists or is no longer valid for update");	
 		}
-		if(offerToBeUpdated.get().isCounterOffer()) {
+		if(offerToBeUpdated.get().getIsCounterOffer()) {
 			throw new InvalidRequestException("Counter offer can not be updated.");
 		}
 		copyNonNullProperties(offer, offerToBeUpdated.get());
@@ -170,7 +170,7 @@ public class OfferServiceImp implements IOfferService{
 		}
 		List<Offer> counterOffers = findCounterOffers(acceptedCounterOffer.getParentOffer().getId()); 
 		for(Offer counterOffer:counterOffers) {
-			if(counterOffer.isHasMatchingOffer()) {
+			if(counterOffer.getHasMatchingOffer()) {
 				Optional<Offer> matchedOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(counterOffer.getMatchingOffer().getId(), CommonConstants.OFFER_COUNTERMADE, LocalDateTime.now());
 				if(counterOffer.getId() == acceptedCounterOffer.getId())
 					matchedOffer.get().setStatus(CommonConstants.OFFER_EXPIRED);
@@ -268,7 +268,7 @@ public class OfferServiceImp implements IOfferService{
 			throw new InvalidRequestException("Offer with given id does not exists.");		
 		}
 		Offer offerToBeDeleted = offerOptional.get();
-		if(offerToBeDeleted.isCounterOffer()) {
+		if(offerToBeDeleted.getIsCounterOffer()) {
 			deleteCounterOffer(offerToBeDeleted);
 		}else {
 			deleteAllCounterOffer(offerToBeDeleted);	
@@ -278,7 +278,7 @@ public class OfferServiceImp implements IOfferService{
 	}
 	
 	private void deleteCounterOffer(Offer offer) {
-		if(offer.isHasMatchingOffer()) {
+		if(offer.getHasMatchingOffer()) {
 			Optional<Offer> matchedOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getMatchingOffer().getId(), CommonConstants.OFFER_COUNTERMADE, LocalDateTime.now());		
 			matchedOffer.get().setStatus(CommonConstants.OFFER_OPEN);
 			offerRepository.save(matchedOffer.get());
@@ -321,7 +321,7 @@ public class OfferServiceImp implements IOfferService{
 		map.put("exactMath", exactMatch);
 		List<Offer> rangeMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndDestinationAmountBetweenAndIsCounterOfferAndDestinationAmountNotAndUser_IdNotAndExpirationDateAfterOrderByAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, offer.getAmount()*0.90, offer.getAmount() *1.10, false, offer.getAmount(), userId, LocalDateTime.now());
 		map.put("rangeMath", rangeMatch);
-		if(offer.isSplitOfferAllowed()) {
+		if(offer.getIsSplitOfferAllowed()) {
 			List<Offer> forSplitMatch = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndUser_IdNotAndExpirationDateAfterOrderByDestinationAmountAsc(offer.getDestinationCurrency(), offer.getSourceCurrency(), CommonConstants.OFFER_OPEN, false, userId, LocalDateTime.now());
 			User user = new User();
 			user.setId(userId);
@@ -333,7 +333,7 @@ public class OfferServiceImp implements IOfferService{
 			map.put("splitMatch", splitMathes);	
 		}
 		
-		if(offer.isCounterOfferAllowed()) {
+		if(offer.getIsCounterOfferAllowed()) {
 			map.put("counterOffer", findCounterOffers(id, userId));
 		}
 		return map;
@@ -397,6 +397,7 @@ public class OfferServiceImp implements IOfferService{
 
 	    Set<String> emptyNames = new HashSet<String>();
 	    for(java.beans.PropertyDescriptor pd : pds) {
+	    	if(pd.getName().equals("counterOffer")) continue;
 	        Object srcValue = src.getPropertyValue(pd.getName());
 	        if (srcValue == null) emptyNames.add(pd.getName());
 	    }
