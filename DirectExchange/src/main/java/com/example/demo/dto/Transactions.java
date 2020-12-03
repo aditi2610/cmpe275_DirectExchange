@@ -15,13 +15,19 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author shahh
  *
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+property = "id")
 @Entity
+@JsonSerialize
 @Table(name= "Transactions")
 public class Transactions {
 
@@ -43,7 +49,6 @@ public class Transactions {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="offer", referencedColumnName ="id")
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Offer offer;
 	
 	@Column(name="sendingAmount")
