@@ -328,8 +328,8 @@ public class OfferServiceImp implements IOfferService{
 			List<Offer> listOfC = offerRepository.getListOfC(user,offer.getDestinationCurrency(), offer.getSourceCurrency(), amount, CommonConstants.OFFER_OPEN, 0);
 			List<Offer> listOfB = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfter(offer.getSourceCurrency(), offer.getDestinationCurrency(),CommonConstants.OFFER_OPEN, false, LocalDateTime.now());
 			List<List<Offer>> splitMathes = new ArrayList<>();
-			checkForAEqualsBPlusC(offer.getAmount(), forSplitMatch, splitMathes);
-		 	checkForCMinusBEqualsA(amount,listOfC,  listOfB, splitMathes);
+			checkForAEqualsBPlusC(offer.getDestinationAmount(), forSplitMatch, splitMathes);
+		 	checkForCMinusBEqualsA(offer.getDestinationAmount(),listOfC,  listOfB, splitMathes);
 			map.put("splitMatch", splitMathes);	
 		}
 		
@@ -345,7 +345,7 @@ public class OfferServiceImp implements IOfferService{
 		int size = listOfC.size();
 		for(int i=0;i<size;i++) {
 			for(int j=0; j<listOfB.size(); j++) {
-				double sum = listOfC.get(i).getDestinationAmount() - listOfB.get(j).getAmount();
+				double sum = listOfC.get(i).getAmount() - listOfB.get(j).getDestinationAmount();
 				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
 					List<Offer> temp= new ArrayList<>();
 					temp.add(listOfC.get(i));

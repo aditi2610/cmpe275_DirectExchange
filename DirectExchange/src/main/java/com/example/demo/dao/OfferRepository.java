@@ -23,7 +23,7 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 	
 	public List<Offer> findByUser_IdOrderByStatusAsc(Long userId);
 	
-	@Query(value="Select * from offer where and user != :user source_currency = :sourceCurrency and destination_currency= :destinationCurrency and destination_amount > :amount and status = :status and is_counter_offer = :isCounterOffer and expiration_date < CURRENT_DATE", nativeQuery = true)
+	@Query(value="Select * from offer where user != :user and source_currency = :sourceCurrency and destination_currency= :destinationCurrency and destination_amount > :amount and status = :status and is_counter_offer = :isCounterOffer and expiration_date > CURRENT_DATE", nativeQuery = true)
 	public List<Offer> getListOfC(User user,String sourceCurrency, String destinationCurrency, double amount, int status, int isCounterOffer);
 
 	public List<Offer> findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfter(
