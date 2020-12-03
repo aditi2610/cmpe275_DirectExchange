@@ -46,10 +46,15 @@ public class UserController {
 		try {
 	System.out.println(nickName);
 			res = userService.addUser(nickName, email, password);
-			String siteUrl = Utility.getSiteUrl(request);
-			String verificationCode = res.getBody().toString();
-		 	userService.sendVerificationEmail(nickName, email,verificationCode, siteUrl);
-		 	res = new ResponseEntity<>(HttpStatus.CREATED);
+			
+		 	if(res.getStatusCode()==HttpStatus.OK) {
+		 		System.out.println("user created no issues");
+		 		String siteUrl = Utility.getSiteUrl(request);
+				String verificationCode = res.getBody().toString();
+			 	userService.sendVerificationEmail(nickName, email,verificationCode, siteUrl);	
+			 	res = new ResponseEntity<>(HttpStatus.CREATED);
+		 	}
+		 	
 		} catch (InvalidRequestException e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);

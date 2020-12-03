@@ -37,11 +37,16 @@ public class UserServiceImpl implements IUserService {
 			User user1=userRepository.findByNickName(nickName);
 			if(user1==null)
 			{
+				System.out.println("the new user getting created"+nickName+" "+email);
+				
+				
+				
 			user=new User(nickName,email,password);
 			
 			String randomCode = RandomString.make(64);
 			user.setVerificationCode(randomCode);
 			userRepository.save(user);
+			System.out.println("the new user getting saved"+nickName+" "+email);
 			return new ResponseEntity<>(user, HttpStatus.OK);
 			}
 			else
@@ -104,12 +109,14 @@ public class UserServiceImpl implements IUserService {
 		mailContent += "<h3><a href=\""+ verifyUrl +"\">VERIFY</a></h3>";
 		mailContent += "<br><p> Thank you <br>Direct Exchange Team</p>";
 		MimeMessage message = javaMailSender.createMimeMessage();
+		System.out.println("mail sending");
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 		helper.setFrom("mangsaditi26@gmail.com",senderName);
 		helper.setTo(email);
 		helper.setSubject(subject);
 		helper.setText(mailContent, true);
 		javaMailSender.send(message);
+		System.out.println("mail sent");
 		
 	}
 	
