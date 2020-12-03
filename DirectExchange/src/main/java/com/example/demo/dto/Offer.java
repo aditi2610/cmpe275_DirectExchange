@@ -24,8 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
-property = "id")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+//property = "id")
 @Entity
 @Table(name="Offer")
 @DynamicUpdate
@@ -78,7 +78,7 @@ public class Offer {
 	
 	@JsonProperty
     @Column(name="isCounterOffer")
-    private Boolean isCounterOffer;
+    private Boolean isCounterOffer = false;
     
 	@ManyToOne(targetEntity = Offer.class)
     private Offer parentOffer;
@@ -90,12 +90,13 @@ public class Offer {
     @Column(name="hasCounterParent", columnDefinition = "boolean default false")
     private Boolean hasMatchingOffer = false;
     
-	@ManyToOne( fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user", referencedColumnName = "id")
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User user;
 	
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private User offerAcceptor;
 	
 	@JsonProperty
@@ -111,6 +112,7 @@ public class Offer {
 	@OneToMany(mappedBy = "offer")
 	private Set<Transactions> transaction;
 	
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections"})
 	public User getOfferAcceptor() {
 		return offerAcceptor;
 	}
@@ -179,6 +181,7 @@ public class Offer {
 		this.status = status;
 	}
 
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections"})
 	public User getUser() {
 		return user;
 	}
@@ -319,4 +322,7 @@ public class Offer {
         return eb.isEquals();
     }
 	
+    public String toString() {
+    	return this.id+" "+this.sourceCurrency+" "+this.destinationCurrency+"\n";
+    }
 }

@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
-property = "id")
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+//property = "id")
 @Entity
 @Table(name="User")
 public class User {
@@ -112,6 +112,7 @@ public class User {
 		this.senderTransections = senderTransections;
 	}
 
+	@JsonIgnoreProperties({"user"})
 	public Set<Offer> getOffers() {
 		return offers;
 	}

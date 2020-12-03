@@ -77,6 +77,7 @@ public class Transactions {
 	
 
 
+	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections"})
 	public User getSender() {
 		return sender;
 	}

@@ -98,6 +98,7 @@ public class OfferController {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
+		System.out.println(newOffer);
 		return new ResponseEntity<>(newOffer,HttpStatus.OK);
 	}
 	
