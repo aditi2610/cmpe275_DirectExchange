@@ -42,7 +42,7 @@ function MatchingOffers(props) {
         </Row>
         <br/>
         <Row>
-          <Col><Link to={`/matching-offer/${props.id}/${offer.id}/accept`}><Button variant='primary'>Accept</Button></Link>{' '}<Button variant='danger'>Counter Offer</Button>
+          <Col><Link to={`/matching-offer/${props.id}/${offer.id}/accept`}><Button variant='primary'>Accept</Button></Link>{' '}<Link to={`/create-counter-offer/${offer.id}`}><Button variant='primary'>Counter Offer</Button></Link>
           </Col>
         </Row>
         </Card.Body>
