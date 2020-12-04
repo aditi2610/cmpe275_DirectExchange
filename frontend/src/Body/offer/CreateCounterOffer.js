@@ -15,7 +15,7 @@ function CreateCounterOffer(props) {
       "parentOffer" : {
         "id" : parseInt(parentOfferId),
       },
-      "amount" :parseInt(form.amount.value),
+      "amount" :parseFloat(form.amount.value),
       "exchangeRate" :parseFloat(form.exchangeRate.value),
       "user": {
           "id" :parseInt(localStorage.getItem('userId')),
