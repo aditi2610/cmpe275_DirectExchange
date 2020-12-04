@@ -41,16 +41,16 @@ class PrevailingRates extends Component {
     });
   }
 
-  sendEmail(e) {
-    e.preventDefault();
-    console.log(" Send Emails: " + e.target);
-    emailjs.sendForm("service_f8jmo8y", "template_tzy5aro", e.target, "user_Ec6uKvIdbgBq1PetK5PwC")
-      .then((result) => {
-        console.log(result.text);
-      }, (error) => {
-        console.log(error.text);
-      });
-  }
+  // sendEmail(e) {
+  //   e.preventDefault();
+  //   console.log(" Send Emails: " + e.target);
+  //   emailjs.sendForm("service_f8jmo8y", "template_tzy5aro", e.target, "user_Ec6uKvIdbgBq1PetK5PwC")
+  //     .then((result) => {
+  //       console.log(result.text);
+  //     }, (error) => {
+  //       console.log(error.text);
+  //     });
+  // }
   render() {
     return (
       <div><h4>Exchange Rates Table</h4>
@@ -82,7 +82,7 @@ class PrevailingRates extends Component {
 
           </table>
 
-          <form className="contact-form" onSubmit={this.sendEmail}>
+          {/* <form className="contact-form" onSubmit={this.sendEmail}>
             <input type="hidden" name="contact_number" onChange={this.inputHandler} />
             <label>Name</label>
             <input type="text" name="user_name" onChange={this.inputHandler} />
@@ -91,7 +91,7 @@ class PrevailingRates extends Component {
             <label>Message</label>
             <textarea name="message" />
             <input type="submit" value="Send" />
-          </form>
+          </form> */}
         </Container>
       </div>
     )

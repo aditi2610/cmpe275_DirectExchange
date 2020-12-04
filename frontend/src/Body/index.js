@@ -17,6 +17,7 @@ import AcceptCounterOffer from './offer/AcceptCounterOffer';
 import AcceptMatchingOffer from './offer/AcceptMatchingOffer';
 import RedirectToLogin from './RedirectToLogin';
 import MyTransactions from './Transaction/MyTransactions';
+import Message from './Message';
 
 function Body(props) {
   return (
@@ -36,6 +37,7 @@ function Body(props) {
       <Route exact path="/create-counter-offer/:offerId/accept" component={AcceptCounterOffer} />
       <Route exact path="/matching-offer/:myOfferId/:acceptedOfferId/accept" component={AcceptMatchingOffer} />
       <Route exact path="/my-transactions" component={MyTransactions} />
+      <Route exact path="/message/:receiverEmailId" component={Message} />
     </Switch>
   );
 }
