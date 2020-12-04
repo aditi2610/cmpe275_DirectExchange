@@ -1,6 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
-import { rooturl } from '../../config/config';
+import { offerStatus, rooturl } from '../../config/config';
 import {Table, Container, Button} from 'react-bootstrap';
 
 function MyTransactions(props) {
@@ -24,7 +24,7 @@ function MyTransactions(props) {
   },[reload])
   let pendingTransactions = transactions.filter(t => t.status === 0);
   let completedTransactions = transactions.filter(t => t.status === 1);
-  let expiredTransactions = transactions.filter(t => t.status === 2);
+  let expiredTransactions = transactions.filter(t => t.status === 2 || new Date().getTime() > new Date(t.expirationDate).getTime());
   return (
     <Container>
       <h4>Pending Transactions</h4>
@@ -53,7 +53,7 @@ function MyTransactions(props) {
           <tr>
             <th>Amount</th>
             <th>Expiration Date</th>
-            <th>Action</th>
+            <th>Offer Status</th>
           </tr>
         </thead>
         <tbody>
@@ -61,7 +61,7 @@ function MyTransactions(props) {
               return <tr>
                 <td>{transaction.sourceCurrency} {transaction.sendingAmount}</td>
                 <td>{new Intl.DateTimeFormat('en-US', {year: 'numeric', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(new Date(transaction.expirationDate))}</td>
-                <td>{transaction.status}</td>
+                <td>{offerStatus[transaction.offer.status]}</td>
                 </tr>
             })}
         </tbody>
@@ -72,7 +72,7 @@ function MyTransactions(props) {
           <tr>
             <th>Amount</th>
             <th>Expiration Date</th>
-            <th>Action</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -80,7 +80,7 @@ function MyTransactions(props) {
               return <tr>
                 <td>{transaction.sourceCurrency} {transaction.sendingAmount}</td>
                 <td>{new Intl.DateTimeFormat('en-US', {year: 'numeric', month: '2-digit',day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(new Date(new Date(transaction.expirationDate)))}</td>
-                <td>{transaction.status}</td>
+                <td>Expired</td>
                 </tr>
             })}
         </tbody>
