@@ -11,28 +11,24 @@ function Message(props) {
     // this.inputHandler = this.inputHandler.bind(this);
     let [responseMsg, setResponseMsg] = React.useState('');
 
-
+    // to_name should be the one who is sending the email
     let handleSubmit = (e) => {
+        console.log("Event:  " + e.target.message.value);
+
         e.preventDefault();
-        console.log(" Send Emails: " + e.target);
-        emailjs.sendForm("service_f8jmo8y", "template_tzy5aro", e.target, "user_Ec6uKvIdbgBq1PetK5PwC")
+        let templateParams = {
+            from_name: localStorage.getItem("nickName"),
+            to_name: receiverEmailId,
+            subject: 'Hello Somya',
+            message: e.target.message.value,
+        }
+        emailjs.send("service_f8jmo8y", "template_tzy5aro", templateParams, "user_Ec6uKvIdbgBq1PetK5PwC")
             .then((result) => {
                 console.log(result.text);
             }, (error) => {
                 console.log(error.text);
             });
 
-    }
-
-    let inputHandler = (event) => {
-        const target = event.target;
-        const value = target.value;
-
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
     }
 
 
@@ -47,7 +43,8 @@ function Message(props) {
                         Message:
           </Form.Label>
                     <Col sm="9">
-                        <Form.Control name="message" type="text" placeholder="Type Your message here" />
+                        <Form.Control name="message" type="text" placeholder="Type Your message here"
+                        />
                     </Col>
                 </Form.Group>
                 <Col>

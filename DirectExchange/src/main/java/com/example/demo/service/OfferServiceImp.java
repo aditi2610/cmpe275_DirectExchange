@@ -247,11 +247,12 @@ public class OfferServiceImp implements IOfferService{
 				acceptedCounterOffer.getSourceCurrency(),
 				acceptedCounterOffer.getAmount()*acceptedCounterOffer.getExchangeRate()*0.05,
 				acceptedCounterOffer);
-		transactionsRepository.save(t1);
-		transactionsRepository.save(t2);
 		t1.setExpirationDate(null);
 		t2.setExpirationDate(null);
-		
+
+		transactionsRepository.save(t1);
+		transactionsRepository.save(t2);
+				
 		acceptedCounterOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
 		acceptedCounterOffer.setOfferAcceptor(acceptedCounterOffer.getParentOffer().getUser());
 		offerRepository.save(acceptedCounterOffer);
