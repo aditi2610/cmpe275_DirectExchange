@@ -45,6 +45,10 @@ public class User {
 	@Column(name= "Password", nullable = false)
 	private String password;
 	
+	//0 for N/A, 1 ,2,3,4,5 rating
+	@Column(name="rating", columnDefinition = "int default 0")
+	private int rating = 0;
+	
 	@JsonProperty
 	@Column(name= "IsVerified", nullable = false)
 	private boolean isVerified;
@@ -182,6 +186,12 @@ public class User {
 		this.nickName = nickName;
 	}
 
+	public int getRating() {
+		return rating;
+	}
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
 	@JsonIgnoreProperties({"accounts"})
 	public Set<BankAccount> getAccounts() {
 		return accounts;

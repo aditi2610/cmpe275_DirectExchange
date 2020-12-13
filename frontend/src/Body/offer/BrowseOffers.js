@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Card, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { rooturl } from '../../config/config';
+import Rating from '../Rating';
 
 function BrowseOffers(props) {
   let [offers, setOffers] = React.useState([]);
@@ -26,7 +27,9 @@ function BrowseOffers(props) {
             <Card.Body>
               <Row>
                 <Col><b>User :</b> {offer.user && offer.user.nickName}</Col>
-                <Col><b>Reputation :</b> {Math.round((Math.random() * 6 + Number.EPSILON) * 100) / 100}</Col>
+                <Col><b>Reputation :</b>
+                <Rating ratings={offer.user.ratings} /> 
+                </Col>
                 <Col></Col>
               </Row>
               <Row>
@@ -48,6 +51,7 @@ function BrowseOffers(props) {
           </Card><br /></>
         })}
       </Container>
+      
   );
 }
 
