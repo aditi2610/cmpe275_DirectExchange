@@ -36,7 +36,7 @@ public interface TransactionsRepository extends JpaRepository<Transactions, Long
 	List<Object[]> generateReport();
 	
 	
-	@Query(value= "Select sum(sending_amount) as sendingAmount, sum(receving_amount) as recevingAmount, sum(servie_fee) as serviceFee from transactions where sender_id = :senderId and status = 1 and creation_date >= date_Add(now(), interval -12 month)", nativeQuery = true)
+	@Query(value= "Select sum(t.sending_amount/(select rate from currency_rates where currency_code = t.source_currency)) as sendingAmount, sum(t.receving_amount/(select rate from currency_rates where currency_code = t.destination_currency)) as recevingAmount, sum(t.servie_fee/c.rate) as serviceFee from transactions t inner join currency_rates c on c.currency_code = t.source_currency where t.sender_id = :senderId and t.status = 1 and t.creation_date >= date_Add(now(), interval -12 month)", nativeQuery = true)
 	public List<Object[]> findByTransactionHistoryStats(Long senderId);
 	
 	
