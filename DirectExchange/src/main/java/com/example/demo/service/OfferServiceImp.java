@@ -14,6 +14,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
@@ -68,7 +69,6 @@ public class OfferServiceImp implements IOfferService{
 			if(offer.getDestinationCurrency().equals(offer.getSourceCurrency())) {
 				throw new InvalidRequestException(" Source and destination Currency should not be same.");	
 			}
-		
 		} else {
 			Optional<Offer> temp = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getParentOffer().getId(), CommonConstants.OFFER_OPEN, LocalDateTime.now());
 			if(!temp.isPresent()) {
@@ -89,6 +89,7 @@ public class OfferServiceImp implements IOfferService{
 			if(offer.getAmount() < lowerLimit || offer.getAmount() > upperLimit) {
 				throw new InvalidRequestException("InValid Request for counter offer. Amount exceeds 10% lower or upper bound");						
 			}
+			
 			if(offer.getHasMatchingOffer()) {
 				Optional<Offer> counterModeOffer = offerRepository.findByIdAndStatusAndExpirationDateAfter(offer.getMatchingOffer().getId(), CommonConstants.OFFER_OPEN, LocalDateTime.now());
 				if(!counterModeOffer.isPresent()) {
@@ -124,26 +125,34 @@ public class OfferServiceImp implements IOfferService{
 		return allOffers;
 	}
 	
-	
-	//TODO:
-	public Page<Offer> findAllWithFiltering(String sourceCurrency, double amount, String destinationCurrency, double destinationAmount, int page, int size) throws Exception{
+	@Override
+	public Page<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount, int page, int size) throws Exception{
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Offer> criteriaQuery = criteriaBuilder.createQuery(Offer.class);
 		Root<Offer> offerRoot = criteriaQuery.from(Offer.class);
-		Predicate predicatesourceCurrency = criteriaBuilder.equal(offerRoot.get("sourceCurrency"), sourceCurrency);
-		Predicate predicateamount = criteriaBuilder.equal(offerRoot.get("amount"), amount);
-		Predicate predicatedestinationCurrency = criteriaBuilder.equal(offerRoot.get("destinationCurrency"), destinationCurrency);
-		Predicate predicatedestinationAmount = criteriaBuilder.equal(offerRoot.get("destinationAmount"), destinationAmount);
-		CriteriaQuery<Offer> select = criteriaQuery.select(offerRoot);
-//		if(sourceCurrency != null && !sourceCurrency.isEmpty()) {
-//			 ParameterExpression<String> p = criteriaBuilder.parameter(String.class);
-//			  q.where(criteriaBuilder.equal(offerRoot.get("sourceCurrency"), p));
-//		}
-		TypedQuery<Offer> typedQuery = entityManager.createQuery(select);
-		typedQuery.setFirstResult(0);
-		typedQuery.setMaxResults(size);
-		List<Offer> fooList = typedQuery.getResultList();
+		List<Predicate> predicateList = new ArrayList<>();
+	
+//		CriteriaQuery<Offer> select = criteriaQuery.select(offerRoot);
+		if(sourceCurrency != null && !sourceCurrency.isEmpty()) {
+			Predicate predicatesourceCurrency = criteriaBuilder.equal(offerRoot.get("sourceCurrency"), sourceCurrency);	
+			predicateList.add(predicatesourceCurrency);
+		}
+		if(destinationCurrency != null && !destinationCurrency.isEmpty()) {
+			Predicate predicatedestinationCurrency = criteriaBuilder.equal(offerRoot.get("destinationCurrency"), destinationCurrency);
+			predicateList.add(predicatedestinationCurrency);
+		}
 		
+		if(destinationAmount != null) {
+			Predicate predicatedestinationAmount = criteriaBuilder.equal(offerRoot.get("destinationAmount"), destinationAmount);
+			predicateList.add(predicatedestinationAmount);
+		}
+		if(amount != null) {
+			Predicate predicateamount = criteriaBuilder.equal(offerRoot.get("amount"), amount);
+			predicateList.add(predicateamount);
+		}
+		criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[predicateList.size()])));
+		List<Offer> items =  entityManager.createQuery(criteriaQuery).getResultList();
+		System.out.print(items);
 		return null;
 	}
 	
@@ -218,11 +227,23 @@ public class OfferServiceImp implements IOfferService{
 	
 	@Override
 	public boolean acceptCounterOfferFromBrosePage(Long offerId) throws Exception{
+		
 		Optional<Offer> acceptedCounterOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offerId, CommonConstants.OFFER_OPEN , LocalDateTime.now());
 		if(!acceptedCounterOfferOptional.isPresent()) {
 			throw new InvalidRequestException("Offer does not exists.");				
 		}
 		Offer acceptedCounterOffer = acceptedCounterOfferOptional.get();
+		if(acceptedCounterOffer.getIsSplitOfferAllowed()) {
+			List<Long> l = new ArrayList<>();
+			l.add(acceptedCounterOffer.getMatchingOffer().getId());
+			l.add(offerId);
+			l.add(acceptedCounterOffer.getSplitMatchedOffer().getId());
+			if(acceptedCounterOffer.getSpitType()) {
+				return acceptSplitOfferFromMyOfferBPlusC(l);
+			}else {
+				return acceptSplitOfferFromMyOfferCMinusB(l);
+			}
+		}
 		if(acceptedCounterOffer.getUser().equals(acceptedCounterOffer.getParentOffer().getUser())) {
 			throw new InvalidRequestException("Offer Creator and acceptor cannot be the same person");				
 		}
@@ -265,7 +286,6 @@ public class OfferServiceImp implements IOfferService{
 
 		transactionsRepository.save(t1);
 		transactionsRepository.save(t2);
-				
 		acceptedCounterOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
 		acceptedCounterOffer.setOfferAcceptor(acceptedCounterOffer.getParentOffer().getUser());
 		offerRepository.save(acceptedCounterOffer);
@@ -296,6 +316,115 @@ public class OfferServiceImp implements IOfferService{
 		return true;
 	}
 	
+	/*
+	 *  A = $1000 , RS 70000
+	 *  B = Rs 35000 intoExchange  $500
+	 *  C = Rs 35000 intoexchange  $500
+	 * */
+	@Override
+	public boolean acceptSplitOfferFromMyOfferBPlusC(List<Long> offers) throws Exception {
+		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offers.get(0), CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		Optional<Offer> offerBOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offers.get(1), CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		Optional<Offer> offerCOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offers.get(2), CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		
+		Offer acceptedOffer = acceptedOfferOptional.get();
+		Offer offerB = offerBOptional.get();
+		Offer offerC = offerCOptional.get();
+		double acceptSendingAmount = offerB.getAmount() * offerB.getExchangeRate() + offerC.getAmount() * offerC.getExchangeRate();
+		double acceptReceivingAmount = offerB.getAmount() * 0.95 + offerC.getAmount() * 0.95;
+//		Transactions t1 = new Transactions(
+//				acceptedOffer.getUser(),
+//				null, 
+//				acceptSendingAmount,
+//				acceptReceivingAmount,
+//				acceptedOffer.getSourceCurrency(),
+//				acceptedOffer.getDestinationCurrency(),
+//				acceptSendingAmount*0.05 ,
+//				acceptedOffer);
+//		t1.setExpirationDate(null);
+//		transactionsRepository.save(t1);
+//		saveTransaction(offerB,acceptedOffer);
+//		saveTransaction(offerC,acceptedOffer);
+//		deleteAllCounterOffer(acceptedOffer);
+//		deleteAllCounterOffer(offerB);
+//		deleteAllCounterOffer(offerC);
+//		offerB.setStatus(CommonConstants.OFFER_EXPIRED);
+//		offerC.setStatus(CommonConstants.OFFER_EXPIRED);
+//		acceptedOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
+//		acceptedOffer.setOfferAcceptor(offerB.getUser());
+//		offerRepository.save(acceptedOffer);
+//		offerRepository.save(offerB);
+//		offerRepository.save(offerC);
+		return doSPlitOffer(acceptSendingAmount, acceptReceivingAmount, acceptedOffer, offerB, offerC);
+	}
+	/*
+	 *  A = C.destination - B.amount, (C.amount - B.destinationAmount) * 0.50
+	 *  B = Rs 35000 ,  $500
+	 *  C = $1000  , Rs 70,000
+	 * 
+	 * */
+	@Override
+	public boolean acceptSplitOfferFromMyOfferCMinusB(List<Long> offers) throws Exception {
+		Optional<Offer> acceptedOfferOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offers.get(0), CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		Optional<Offer> offerBOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offers.get(1), CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		Optional<Offer> offerCOptional = offerRepository.findByIdAndStatusAndExpirationDateAfter(offers.get(2), CommonConstants.OFFER_OPEN , LocalDateTime.now());
+		
+		Offer acceptedOffer = acceptedOfferOptional.get();
+		Offer offerB = null;
+		Offer offerC = null;
+		if(acceptedOffer.getSourceCurrency() == offerBOptional.get().getSourceCurrency()) {
+			 offerB = offerBOptional.get();
+			 offerC = offerCOptional.get();
+		}else {
+			 offerB = offerCOptional.get();
+			 offerC = offerBOptional.get();
+		}
+		double acceptSendingAmount = offerC.getDestinationAmount() - offerB.getAmount();
+		double acceptReceivingAmount = (offerC.getAmount() - offerB.getDestinationAmount()) * 0.95;
+		return doSPlitOffer(acceptSendingAmount, acceptReceivingAmount, acceptedOffer, offerB, offerC);
+	}
+
+	public boolean doSPlitOffer(double acceptSendingAmount,double acceptReceivingAmount,Offer acceptedOffer,Offer offerB, Offer offerC) throws Exception {
+		Transactions t1 = new Transactions(
+				acceptedOffer.getUser(),
+				null, 
+				acceptSendingAmount,
+				acceptReceivingAmount,
+				acceptedOffer.getSourceCurrency(),
+				acceptedOffer.getDestinationCurrency(),
+				acceptSendingAmount*0.05 ,
+				acceptedOffer);
+		t1.setExpirationDate(null);
+		transactionsRepository.save(t1);
+		saveTransaction(offerB,acceptedOffer);
+		saveTransaction(offerC,acceptedOffer);
+		deleteAllCounterOffer(acceptedOffer);
+		deleteAllCounterOffer(offerB);
+		deleteAllCounterOffer(offerC);
+		offerB.setStatus(CommonConstants.OFFER_EXPIRED);
+		offerC.setStatus(CommonConstants.OFFER_EXPIRED);
+		acceptedOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
+		acceptedOffer.setOfferAcceptor(offerB.getUser());
+		offerRepository.save(acceptedOffer);
+		offerRepository.save(offerB);
+		offerRepository.save(offerC);
+		return true;
+	}
+	
+	public void saveTransaction(Offer currOffer,Offer acceptedOffer) {
+		Transactions t1 = new Transactions(
+				currOffer.getUser(),
+				null, 
+				currOffer.getAmount(),
+				currOffer.getDestinationAmount()*0.95,
+				currOffer.getSourceCurrency(),
+				currOffer.getDestinationCurrency(),
+				currOffer.getAmount()*0.05 ,
+				acceptedOffer);
+		t1.setExpirationDate(null);
+		transactionsRepository.save(t1);
+		
+	}
 	
 	public void saveTransaction(Offer acceptedOffer, User user) {
 		Transactions t1 = new Transactions(
@@ -310,11 +439,11 @@ public class OfferServiceImp implements IOfferService{
 		Transactions t2 = new Transactions(
 				user,
 				acceptedOffer.getUser(),
-				acceptedOffer.getAmount()*acceptedOffer.getExchangeRate(), 
+				acceptedOffer.getDestinationAmount(), 
 				acceptedOffer.getAmount()*0.95,
 				acceptedOffer.getDestinationCurrency(),
 				acceptedOffer.getSourceCurrency(),
-				acceptedOffer.getAmount()*acceptedOffer.getExchangeRate()*0.05,
+				acceptedOffer.getDestinationAmount()*0.05,
 				acceptedOffer);
 		t1.setExpirationDate(null);
 		t2.setExpirationDate(null);
@@ -389,11 +518,13 @@ public class OfferServiceImp implements IOfferService{
 			User user = new User();
 			user.setId(userId);
 			List<Offer> listOfC = offerRepository.getListOfC(user,offer.getDestinationCurrency(), offer.getSourceCurrency(), amount, CommonConstants.OFFER_OPEN, 0);
-			List<Offer> listOfB = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfter(offer.getSourceCurrency(), offer.getDestinationCurrency(),CommonConstants.OFFER_OPEN, false, LocalDateTime.now());
-			List<List<Offer>> splitMathes = new ArrayList<>();
-			checkForAEqualsBPlusC(offer.getDestinationAmount(), forSplitMatch, splitMathes);
-		 	checkForCMinusBEqualsA(offer.getDestinationAmount(),listOfC,  listOfB, splitMathes);
-			map.put("splitMatch", splitMathes);	
+			List<Offer> listOfB = offerRepository.findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfterAndIdNot(offer.getSourceCurrency(), offer.getDestinationCurrency(),CommonConstants.OFFER_OPEN, false, LocalDateTime.now(),id);
+			List<List<Offer>> aEqualsBPlusC = new ArrayList<>();
+			checkForAEqualsBPlusC(offer.getDestinationAmount(), forSplitMatch, aEqualsBPlusC);
+			map.put("aEqualsBPlusC", aEqualsBPlusC);	
+			List<List<Offer>> cMinusBEqulsA = new ArrayList<>();
+			checkForCMinusBEqualsA(offer.getDestinationAmount(),listOfC,  listOfB, cMinusBEqulsA);
+			map.put("cMinusBEqulsA", cMinusBEqulsA);	
 		}
 		
 		if(offer.getIsCounterOfferAllowed()) {
@@ -424,7 +555,7 @@ public class OfferServiceImp implements IOfferService{
 		for(int i=0;i< size-1;i++) {
 			int j= size-1;
 			while(i<j) {
-				double sum = forSplitMatch.get(i).getDestinationAmount() + forSplitMatch.get(j).getDestinationAmount();
+				double sum = forSplitMatch.get(i).getAmount() + forSplitMatch.get(j).getAmount();
 				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
 					List<Offer> temp= new ArrayList<>();
 					temp.add(forSplitMatch.get(i));
@@ -467,5 +598,4 @@ public class OfferServiceImp implements IOfferService{
 	    String[] result = new String[emptyNames.size()];
 	    return emptyNames.toArray(result);
 	}
-
 }

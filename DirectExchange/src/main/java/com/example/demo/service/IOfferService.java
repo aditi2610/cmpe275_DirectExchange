@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.Offer;
@@ -36,4 +37,12 @@ public interface IOfferService {
 	public boolean acceptCounterOfferFromBrosePage(Long offerId) throws Exception;
 
 	public boolean acceptOfferFromMyOffer(Long offerId1, Long offerId2) throws Exception;
+
+	public boolean acceptSplitOfferFromMyOfferCMinusB(List<Long> offers) throws Exception;
+
+	boolean acceptSplitOfferFromMyOfferBPlusC(List<Long> offers) throws Exception;
+
+	Page<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency,
+			Double destinationAmount, int page, int size) throws Exception;
+
 }

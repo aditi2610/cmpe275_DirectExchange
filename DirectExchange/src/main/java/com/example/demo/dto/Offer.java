@@ -103,15 +103,24 @@ public class Offer {
 	@Column(name="isSplitMatch", columnDefinition = "boolean default false")
 	private Boolean isSplitMatch = false;
 	    
-	@ManyToOne( fetch = FetchType.LAZY)
-	@JoinColumn(name = "splitMatchUser", referencedColumnName = "id")
-	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private User splitMatchedUser;
+	 @ManyToOne(targetEntity = Offer.class)
+	private Offer splitMatchedOffer;
 		
+	@JsonProperty
+	@Column(name="splitType", columnDefinition = "boolean default false")
+	private Boolean spitType;
 	
 	@OneToMany(mappedBy = "offer")
 	private Set<Transactions> transaction;
 	
+	public Boolean getSpitType() {
+		return spitType;
+	}
+
+	public void setSpitType(Boolean spitType) {
+		this.spitType = spitType;
+	}
+
 	@JsonIgnoreProperties({"accounts", "offers", "senderTransections", "receiverTransections","acceptedOffer"})
 	public User getOfferAcceptor() {
 		return offerAcceptor;
@@ -121,12 +130,12 @@ public class Offer {
 		this.offerAcceptor = offerAcceptor;
 	}
 
-	public User getSplitMatchedUser() {
-		return splitMatchedUser;
+	public Offer getSplitMatchedOffer() {
+		return splitMatchedOffer;
 	}
 
-	public void setSplitMatchedUser(User splitMatchedUser) {
-		this.splitMatchedUser = splitMatchedUser;
+	public void setSplitMatchedOffer(Offer splitMatchedOffer) {
+		this.splitMatchedOffer = splitMatchedOffer;
 	}
 
 	public Double getDestinationAmount() {

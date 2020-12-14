@@ -16,7 +16,6 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 	
 	public Optional<Offer> findByIdAndUserAndStatus(Long offerId, User user, int active);
 
-	public List<Offer> findByParentOfferAndStatus(Offer offer, int status);
 	
 	public List<Offer> findByStatusAndIsCounterOffer(int status, boolean isCounterOffer);
 	
@@ -29,8 +28,8 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
 	@Query(value="Select * from offer where user != :user and source_currency = :sourceCurrency and destination_currency= :destinationCurrency and destination_amount > :amount and status = :status and is_counter_offer = :isCounterOffer and expiration_date > CURRENT_DATE", nativeQuery = true)
 	public List<Offer> getListOfC(User user,String sourceCurrency, String destinationCurrency, double amount, int status, int isCounterOffer);
 
-	public List<Offer> findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfter(
-			String sourceCurrency, String destinationCurrency, int status, boolean isCounterOffer, LocalDateTime now);
+	public List<Offer> findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndExpirationDateAfterAndIdNot(
+			String sourceCurrency, String destinationCurrency, int status, boolean isCounterOffer, LocalDateTime now,long userId);
 
 	public List<Offer> findBySourceCurrencyAndDestinationCurrencyAndStatusAndIsCounterOfferAndUser_IdNotAndExpirationDateAfterOrderByDestinationAmountAsc(
 			String destinationCurrency, String sourceCurrency, int status, boolean isCounterOffer, Long userId,

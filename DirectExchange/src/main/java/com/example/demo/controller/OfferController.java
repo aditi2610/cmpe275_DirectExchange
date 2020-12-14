@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.websocket.server.PathParam;
-
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,9 +79,10 @@ public class OfferController {
 
 	@RequestMapping(value="offer", method = RequestMethod.GET)
 	public ResponseEntity<?> getAllOffers(){
-		List<Offer> newOffer;
+		Page<Offer> newOffer;
 		try {
-			newOffer = offerService.findAll();
+			newOffer = offerService.findAllWithFiltering(null,(double) 480,null,null,0,2);
+			//newOffer = offerService.findAll();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
@@ -180,7 +181,7 @@ public class OfferController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
+		return new ResponseEntity<>("Offer Accepted is"+ flag,HttpStatus.CREATED);
 	} 
 	
 	
@@ -193,22 +194,25 @@ public class OfferController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
+		return new ResponseEntity<>("Offer Accepted is"+ flag,HttpStatus.CREATED);
+	}	
+
+	//If flagType is True B Plus C
+	@RequestMapping(value="offer/acceptSplitOfferFromMyOffer/{flagType}", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<?> acceptSplitOfferFromMyOfferBPlusC(@PathVariable("flagType") Boolean flagType,@RequestBody List<Long> offers) throws Exception{
+		boolean flag;
+		try {
+			if(flagType) {
+				flag = offerService.acceptSplitOfferFromMyOfferBPlusC(offers);			
+			}else {
+				flag = offerService.acceptSplitOfferFromMyOfferCMinusB(offers);
+				
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return new ResponseEntity<>("Offer Accepted is "+flag,HttpStatus.CREATED);
 	}
-	
-	
-//	
-//	@RequestMapping(value="offer/get", method = RequestMethod.POST)
-//	@ResponseBody
-//	public ResponseEntity<?> getAllTransection(@PathParam("offerId1") Long offerId1, @PathParam("offerId2") Long offerId2){
-//		boolean flag;
-//		try {
-//			flag = offerService.acceptOfferFromMyOffer(offerId1,offerId2);
-//		} catch (Exception e) {
-//			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
-//		}
-//		return new ResponseEntity<>("Offer Accepted",HttpStatus.CREATED);
-//	} 
-	
 	
 }
