@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -14,7 +17,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Common.CommonUtilities;
+import com.example.demo.dao.TransactionsRepository;
 import com.example.demo.dao.UserRepository;
+import com.example.demo.dto.Transactions;
 import com.example.demo.dto.User;
 import com.example.demo.exception.InvalidRequestException;
 
@@ -27,6 +32,10 @@ public class UserServiceImpl implements IUserService {
 	
 	@Autowired
 	private JavaMailSender javaMailSender;
+	
+	@Autowired
+	private TransactionsRepository transactionsRepository;
+	
 	@Override
 	public ResponseEntity<?> addUser(String nickName, String email, String password) throws InvalidRequestException {
 		// TODO Auto-generated method stub
@@ -117,6 +126,34 @@ public class UserServiceImpl implements IUserService {
 		helper.setText(mailContent, true);
 		javaMailSender.send(message);
 		System.out.println("mail sent");
+		
+	}
+	@Override
+	public void setUserReputation(Long id) {
+		// TODO Auto-generated method stub
+		Optional<User> user=userRepository.findById(id);
+		User userActual=user.get();
+		List<Transactions> transList= transactionsRepository.findBySender_Id(id);
+		int numberOfTransactions=0;
+		int numberOfAtFault=0;
+		int rating=0;
+		if(transList!=null)
+		{
+			numberOfTransactions=transList.size();
+			
+			for(int i=0;i<transList.size();i++)
+			{
+				if(transList.get(i).getExpirationDate().isBefore(LocalDateTime.now())&&transList.get(i).getStatus()!=1)
+				{
+					numberOfAtFault++;
+				}
+			}
+			rating=Math.round(1-numberOfAtFault/numberOfTransactions*4+1);
+			System.out.println(id+" "+numberOfTransactions+" "+numberOfAtFault+" rating"+rating);
+			userActual.setRating(rating);
+			userRepository.save(userActual);
+
+		}
 		
 	}
 	

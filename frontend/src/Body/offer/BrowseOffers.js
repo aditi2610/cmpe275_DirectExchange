@@ -28,7 +28,7 @@ function BrowseOffers(props) {
               <Row>
                 <Col><b>User :</b> {offer.user && offer.user.nickName}</Col>
                 <Col><b>Reputation :</b>
-                <Rating ratings={offer.user.ratings} /> 
+                <Rating rating={offer.user.rating} /> 
                 </Col>
                 <Col></Col>
               </Row>

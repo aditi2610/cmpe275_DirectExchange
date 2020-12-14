@@ -48,8 +48,13 @@ public class OfferServiceImp implements IOfferService{
 	@Autowired
 	private TransactionsRepository transactionsRepository;
 	
+	@Autowired
+	private IUserService userService;
+	
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	
 
 	@Override
 	public Offer add(Offer offer) throws InvalidRequestException{
@@ -307,6 +312,9 @@ public class OfferServiceImp implements IOfferService{
 		t2.setExpirationDate(null);
 		transactionsRepository.save(t1);
 		transactionsRepository.save(t2);
+		
+		userService.setUserReputation(acceptedOffer.getUser().getId());
+		userService.setUserReputation(user.getId());
 	}
 	@Override
 	public void delete(Long id) throws Exception {

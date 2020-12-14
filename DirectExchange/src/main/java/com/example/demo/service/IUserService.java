@@ -19,4 +19,6 @@ public interface IUserService {
 	public boolean verify(String verificaitonCode);
 
 	void sendVerificationEmail(String nickName, String email, String verificationCode, String siteUrl)throws UnsupportedEncodingException, MessagingException;
+	
+	void setUserReputation(Long id);
 }

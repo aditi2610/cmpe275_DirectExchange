@@ -1,52 +1,52 @@
 import React from 'react';
 const Rating = (props) => {
 
-    var ratings;
-    if(props.ratings){
-        ratings = props.ratings;
+    var rating;
+    if(props.rating){
+        rating = props.rating;
     }
     
     var ratingsDiv;
-    if(ratings === 5){
+    if(rating === 5){
        ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
-    </span>);
-    } else if (ratings === 4){
+    5</span>);
+    } else if (rating === 4){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star-o"></i>
-    </span>);
-    } else if (ratings === 3){
+    4</span>);
+    } else if (rating === 3){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
-    </span>);
-    } else if (ratings === 2){
+    3</span>);
+    } else if (rating ===2){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
-    </span>);
-    } else if (ratings === 1){
+    2</span>);
+    } else if (rating === 1){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
-    </span>);
+    1</span>);
     } else {
         ratingsDiv = ( <span className="star-rating">
         N/A

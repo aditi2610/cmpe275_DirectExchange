@@ -2,8 +2,14 @@
   width: 100%;
   height: 100%;
   text-align: center;
+  
+}
+.App .star-rating {
+  line-height:32px;
+  font-size:1.25em;
 }
 
+.App .star-rating .fa-star{color: yellow;}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
