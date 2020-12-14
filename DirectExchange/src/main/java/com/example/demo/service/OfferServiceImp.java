@@ -151,6 +151,14 @@ public class OfferServiceImp implements IOfferService{
 	@Override
 	public List<Offer> findAllWithoutUserOffer(Long userId) {
 		List<Offer> allOffers = offerRepository.findByStatusAndIsCounterOfferAndExpirationDateAfterAndUser_IdNot(CommonConstants.OFFER_OPEN, false, LocalDateTime.now(), userId);
+		
+		if(allOffers.size()>0)
+		{
+			for(int i=0;i<allOffers.size();i++)
+			{
+				userService.setUserReputation(allOffers.get(i).getUser().getId());
+			}
+		}
 		return allOffers;
 	}
 	

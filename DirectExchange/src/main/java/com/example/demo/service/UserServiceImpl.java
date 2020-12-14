@@ -137,6 +137,7 @@ public class UserServiceImpl implements IUserService {
 		int numberOfTransactions=0;
 		int numberOfAtFault=0;
 		int rating=0;
+		double f=0.0;
 		if(transList!=null)
 		{
 			numberOfTransactions=transList.size();
@@ -148,7 +149,9 @@ public class UserServiceImpl implements IUserService {
 					numberOfAtFault++;
 				}
 			}
-			rating=Math.round(1-numberOfAtFault/numberOfTransactions*4+1);
+			//((1- (# of at-fault transactions) / (# of entered transactions)) * 4) + 1
+			f=(double)numberOfAtFault/numberOfTransactions;
+			rating=(int)Math.round(((1.0-f)*4.0)+1.0);
 			System.out.println(id+" "+numberOfTransactions+" "+numberOfAtFault+" rating"+rating);
 			userActual.setRating(rating);
 			userRepository.save(userActual);

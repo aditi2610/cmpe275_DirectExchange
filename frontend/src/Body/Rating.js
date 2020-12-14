@@ -14,7 +14,7 @@ const Rating = (props) => {
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
-    5</span>);
+    *****</span>);
     } else if (rating === 4){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
@@ -22,7 +22,7 @@ const Rating = (props) => {
         <i className="fa fa-star"></i>
         <i className="fa fa-star"></i>
         <i className="fa fa-star-o"></i>
-    4</span>);
+    ****</span>);
     } else if (rating === 3){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
@@ -30,7 +30,7 @@ const Rating = (props) => {
         <i className="fa fa-star"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
-    3</span>);
+    ***</span>);
     } else if (rating ===2){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
@@ -38,7 +38,7 @@ const Rating = (props) => {
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
-    2</span>);
+    **</span>);
     } else if (rating === 1){
         ratingsDiv = ( <span className="star-rating">
         <i className="fa fa-star"></i>
@@ -46,7 +46,7 @@ const Rating = (props) => {
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
         <i className="fa fa-star-o"></i>
-    1</span>);
+    *</span>);
     } else {
         ratingsDiv = ( <span className="star-rating">
         N/A

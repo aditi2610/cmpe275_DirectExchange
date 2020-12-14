@@ -13,7 +13,9 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.example.demo.service.IUserService;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -80,6 +82,7 @@ public class User {
 	public Set<Transactions> getSenderTransections() {
 		return senderTransections;
 	}
+
 	public User()
 	{
 		
@@ -187,9 +190,11 @@ public class User {
 	}
 
 	public int getRating() {
+		
 		return rating;
 	}
 	public void setRating(int rating) {
+		
 		this.rating = rating;
 	}
 	@JsonIgnoreProperties({"accounts"})
