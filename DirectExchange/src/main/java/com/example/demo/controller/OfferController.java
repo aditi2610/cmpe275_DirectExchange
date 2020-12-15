@@ -6,6 +6,7 @@ import java.util.List;
 import javax.websocket.server.PathParam;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,7 +67,6 @@ public class OfferController {
 	public ResponseEntity<?> getAllOffersByUser(@PathVariable("userId") Long userId){
 		List<Offer> newOffer;
 		try {
-			System.out.println("Inside User Id");
 			newOffer = offerService.findOffersForUser(userId);
 		} catch (InvalidRequestException e) {
 				e.printStackTrace();
@@ -78,15 +78,10 @@ public class OfferController {
 	}
 
 	@RequestMapping(value="offer", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllOffers(@PathParam("sourceCurrency") String sourceCurrency,
-			@PathParam("destinationCurrency") String destinationCurrency,
-			@PathParam("amount") Double amount,
-			@PathParam("destinationAmount") Double destinationAmount,
-			@PathParam("page") int page){
+	public ResponseEntity<?> getAllOffers(){
 		List<Offer> newOffer;
 		try {
-			System.out.println("All Offers"+ sourceCurrency);
-			newOffer = offerService.findAllWithFiltering(sourceCurrency, amount,destinationCurrency,destinationAmount,page,10);
+			newOffer = offerService.findAll();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
@@ -95,15 +90,20 @@ public class OfferController {
 	}
 	
 	@RequestMapping(value="offer/{userId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllOffers(@PathVariable("userId") Long userId){
+	public ResponseEntity<?> getAllOffers(@PathParam("sourceCurrency") String sourceCurrency,
+			@PathParam("destinationCurrency") String destinationCurrency,
+			@PathParam("amount") Double amount,
+			@PathParam("destinationAmount") Double destinationAmount,
+			@PathParam("page") int page,@PathVariable("userId") Long userId){
 		List<Offer> newOffer;
 		try {
-			newOffer = offerService.findAllWithoutUserOffer(userId);
+			newOffer = offerService.findAllWithFiltering(sourceCurrency, amount,destinationCurrency,destinationAmount, userId,page,10);
+			
+			//newOffer = offerService.findAllWithoutUserOffer(userId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
 		}
-		System.out.println(newOffer);
 		return new ResponseEntity<>(newOffer,HttpStatus.OK);
 	}
 	

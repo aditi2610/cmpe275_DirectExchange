@@ -126,7 +126,7 @@ public class OfferServiceImp implements IOfferService{
 	}
 	
 	@Override
-	public List<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount, int page, int size) throws Exception{
+	public List<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount,long userId, int page, int size) throws Exception{
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Offer> criteriaQuery = criteriaBuilder.createQuery(Offer.class);
 		Root<Offer> offerRoot = criteriaQuery.from(Offer.class);
@@ -153,6 +153,7 @@ public class OfferServiceImp implements IOfferService{
 		//findByStatusAndIsCounterOfferAndExpirationDateAfter
 		predicateList.add(criteriaBuilder.equal(offerRoot.get("status"), CommonConstants.OFFER_OPEN));
 		predicateList.add(criteriaBuilder.equal(offerRoot.get("isCounterOffer"), false));
+		predicateList.add(criteriaBuilder.notEqual(offerRoot.get("user"), userId));
 		predicateList.add(criteriaBuilder.greaterThan(offerRoot.get("expirationDate"), LocalDateTime.now()));		
 		criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[predicateList.size()])));
 		TypedQuery<Offer> query = entityManager.createQuery(criteriaQuery);

@@ -42,7 +42,6 @@ public interface IOfferService {
 
 	boolean acceptSplitOfferFromMyOfferBPlusC(List<Long> offers) throws Exception;
 
-	List<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency,
-			Double destinationAmount, int page, int size) throws Exception;
+	public List<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency,Double destinationAmount, long userId, int page, int size) throws Exception;
 
 }
