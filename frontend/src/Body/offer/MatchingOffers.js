@@ -3,9 +3,11 @@ import React from 'react';
 import { Button, Card, Col, Row, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { rooturl } from '../../config/config';
+import SplitOffers from './SplitOffers';
+import Rating from './../Rating';
 
 function MatchingOffers(props) {
-  let [matchingOffers, setMatchingOffers] = React.useState({ exactMath: [], splitMatch: [], counterOffer: [], rangeMath: [] });
+  let [matchingOffers, setMatchingOffers] = React.useState({ exactMath: [], aEqualsBPlusC: [],cMinusBEqulsA: [], counterOffer: [], rangeMath: [] });
   let [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -18,7 +20,6 @@ function MatchingOffers(props) {
   }, [])
 
   let singleMatch = [...matchingOffers.exactMath, ...matchingOffers.rangeMath];
-
   return (
     <div>
       <h4>Single Offers</h4>
@@ -27,7 +28,7 @@ function MatchingOffers(props) {
           <Card.Body>
             <Row>
               <Col><b>User :</b> {offer.user && offer.user.nickName}</Col>
-              <Col><b>Reputation :</b> {Math.round((Math.random() * 6 + Number.EPSILON) * 100) / 100}</Col>
+              <Col><b>Reputation :</b> <Rating rating={offer.user.rating} /></Col>
               <Col></Col>
             </Row>
             <Row>
@@ -42,7 +43,7 @@ function MatchingOffers(props) {
             </Row>
             <br />
             <Row>
-              <Col><Link to={`/matching-offer/${props.id}/${offer.id}/accept`}><Button variant='primary'>Accept</Button></Link>{' '}<Link to={`/create-counter-offer/${offer.id}`}><Button variant='primary'>Counter Offer</Button></Link>
+              <Col><Link to={`/matching-offer/${props.id}/${offer.id}/accept`}><Button variant='primary'>Accept</Button></Link>{' '}<Link to={`/create-counter-offer/${offer.id}/${props.id}`}><Button variant='primary'>Counter Offer</Button></Link>
               </Col>
             </Row>
           </Card.Body>
@@ -50,31 +51,14 @@ function MatchingOffers(props) {
       })}
       <br />
       {
-        props.showSplit && <><h4>Split Matchs</h4>
-          {loading ? <Spinner animation='border'></Spinner> : !(matchingOffers.splitMatch && matchingOffers.splitMatch.length) ? <div>No matching split offers</div> : matchingOffers.splitMatch.map(offers => {
-            return <Card>
-              {offers.map(offer => {
-                return <Card.Body>
-                  <Row>
-                    <Col><b>User :</b> {offer.user && offer.user.nickName}</Col>
-                    <Col><b>Reputation :</b> {Math.round((Math.random() * 6 + Number.EPSILON) * 100) / 100}</Col>
-                    <Col></Col>
-                  </Row>
-                  <Row>
-                    <Col><b>Amount :</b> {offer.amount}</Col>
-                    <Col><b>Source Country :</b> {offer.sourceCountry}</Col>
-                    <Col><b>Source Currency :</b> {offer.sourceCurrency}</Col>
-                  </Row>
-                  <Row>
-                    <Col><b>Destination Country :</b> {offer.destinationCountry}</Col>
-                    <Col><b>Destination Currency :</b> {offer.destinationCurrency}</Col>
-                    <Col><b>Exchange Rate :</b> {offer.exchangeRate}</Col>
-                  </Row>
-                  <br />
-                </Card.Body>
-              })}
-            </Card>
+        props.showSplit && <><h4>Split Matches</h4>
+          {loading ? <Spinner animation='border'></Spinner> : !(matchingOffers.aEqualsBPlusC.length  || matchingOffers.cMinusBEqulsA.length) ? <div>No matching split offers</div> : <>{matchingOffers.aEqualsBPlusC.map(offers => {
+            return <SplitOffers offers={offers} matchingOfferId={props.id} aEqualsBPlusC={true} />
           })}
+          {matchingOffers.cMinusBEqulsA.map(offers => {
+            return <SplitOffers offers={offers} matchingOfferId={props.id} aEqualsBPlusC={false} />
+          })}
+          </>}
           <br /></>
       }
       <h4>Counter Offers</h4>

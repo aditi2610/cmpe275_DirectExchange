@@ -18,6 +18,7 @@ import AcceptMatchingOffer from './offer/AcceptMatchingOffer';
 import RedirectToLogin from './RedirectToLogin';
 import MyTransactions from './Transaction/MyTransactions';
 import Message from './Message';
+import AcceptSplitOffer from './offer/AcceptSplitOffer';
 
 function Body(props) {
   return (
@@ -34,10 +35,12 @@ function Body(props) {
       <Route exact path="/other-signIn" component={OtherSignIn} />
       <Route exact path="/browse-offers/:offerId/:email/accept" component={AcceptBrowseOffer} />
       <Route exact path="/create-counter-offer/:offerId" component={CreateCounterOffer} />
+      <Route exact path="/create-counter-offer/:offerId/:matchingOfferId" component={CreateCounterOffer} />
       <Route exact path="/create-counter-offer/:offerId/:email/accept" component={AcceptCounterOffer} />
       <Route exact path="/matching-offer/:myOfferId/:acceptedOfferId/accept" component={AcceptMatchingOffer} />
       <Route exact path="/my-transactions" component={MyTransactions} />
       <Route exact path="/message/:receiverEmailId" component={Message} />
+      <Route exact path="/accept-split-offer/:matchingOfferId/:splitOffer1/:splitOffer2/:aEqualsBPlusC" component={AcceptSplitOffer} />
     </Switch>
   );
 }

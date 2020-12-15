@@ -5,6 +5,7 @@ import { rooturl } from '../../config/config';
 
 function CreateCounterOffer(props) {
   let parentOfferId = props.match.params.offerId;
+  let matchingOfferId = props.match.params.matchingOfferId;
   let [responseMsg, setResponseMsg] = React.useState('');
 
   let handleSubmit = (e) => {
@@ -21,6 +22,12 @@ function CreateCounterOffer(props) {
         "id": parseInt(localStorage.getItem('userId')),
         "isVerified": true,
       }
+    }
+    if(matchingOfferId){
+      formData["hasMatchingOffer"] = "true";
+      formData["matchingOffer"]  = {
+        "id" : matchingOfferId
+      };
     }
     console.log(formData);
     Axios.post(`${rooturl}/offer`, formData, { validateStatus: false })

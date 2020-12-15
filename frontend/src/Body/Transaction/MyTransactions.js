@@ -23,7 +23,7 @@ function MyTransactions(props) {
       }
     })
   }, [reload])
-  let pendingTransactions = transactions.filter(t => t.status === 0);
+  let pendingTransactions = transactions.filter(t => t.status === 0 && new Date(t.expirationDate).getTime() > new Date().getTime());
   let completedTransactions = transactions.filter(t => t.status === 1);
   let expiredTransactions = transactions.filter(t => t.status === 2 || new Date().getTime() > new Date(t.expirationDate).getTime());
   return (
@@ -39,14 +39,14 @@ function MyTransactions(props) {
           </tr>
         </thead>
         <tbody>
-          {!pendingTransactions.length ? <tr><td colSpan="3">{'No Pending Transactions'}</td></tr> : pendingTransactions.map(transaction => {
+          {!pendingTransactions.length ? <tr><td colSpan="4">{'No Pending Transactions'}</td></tr> : pendingTransactions.map(transaction => {
             return <tr>
               <td>{transaction.sourceCurrency} {transaction.sendingAmount}</td>
               <td>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(transaction.expirationDate))}</td>
               <td><Button onClick={e => handlePay(transaction.id)}>Pay Now</Button></td>
               <td>
-                <Link to={`/message/${transaction.receiver.email}`}><Button variant='primary'>Message</Button>
-                </Link>
+              {transaction.receiver && transaction.receiver.email ? <Link to={`/message/${transaction.receiver.email}`}><Button variant='primary'>Message</Button>
+                </Link>: ''}
               </td>
             </tr>
           })}
