@@ -78,11 +78,15 @@ public class OfferController {
 	}
 
 	@RequestMapping(value="offer", method = RequestMethod.GET)
-	public ResponseEntity<?> getAllOffers(){
-		Page<Offer> newOffer;
+	public ResponseEntity<?> getAllOffers(@PathParam("sourceCurrency") String sourceCurrency,
+			@PathParam("destinationCurrency") String destinationCurrency,
+			@PathParam("amount") Double amount,
+			@PathParam("destinationAmount") Double destinationAmount,
+			@PathParam("page") int page){
+		List<Offer> newOffer;
 		try {
-			newOffer = offerService.findAllWithFiltering(null,(double) 480,null,null,0,2);
-			//newOffer = offerService.findAll();
+			System.out.println("All Offers"+ sourceCurrency);
+			newOffer = offerService.findAllWithFiltering(sourceCurrency, amount,destinationCurrency,destinationAmount,page,10);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);

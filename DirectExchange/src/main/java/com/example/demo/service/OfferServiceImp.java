@@ -126,7 +126,7 @@ public class OfferServiceImp implements IOfferService{
 	}
 	
 	@Override
-	public Page<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount, int page, int size) throws Exception{
+	public List<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount, int page, int size) throws Exception{
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Offer> criteriaQuery = criteriaBuilder.createQuery(Offer.class);
 		Root<Offer> offerRoot = criteriaQuery.from(Offer.class);
@@ -150,10 +150,18 @@ public class OfferServiceImp implements IOfferService{
 			Predicate predicateamount = criteriaBuilder.equal(offerRoot.get("amount"), amount);
 			predicateList.add(predicateamount);
 		}
+		//findByStatusAndIsCounterOfferAndExpirationDateAfter
+		predicateList.add(criteriaBuilder.equal(offerRoot.get("status"), CommonConstants.OFFER_OPEN));
+		predicateList.add(criteriaBuilder.equal(offerRoot.get("isCounterOffer"), false));
+		predicateList.add(criteriaBuilder.greaterThan(offerRoot.get("expirationDate"), LocalDateTime.now()));		
 		criteriaQuery.where(criteriaBuilder.and(predicateList.toArray(new Predicate[predicateList.size()])));
-		List<Offer> items =  entityManager.createQuery(criteriaQuery).getResultList();
-		System.out.print(items);
-		return null;
+		TypedQuery<Offer> query = entityManager.createQuery(criteriaQuery);
+		query.setFirstResult((page-1)*size);
+		query.setMaxResults(size);
+		List<Offer> items = query.getResultList();
+		//List<Offer> items =  entityManager.createQuery(criteriaQuery).getResultList();
+		//System.out.print(items);
+		return items;
 	}
 	
 	
