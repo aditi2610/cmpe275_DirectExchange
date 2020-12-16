@@ -19,6 +19,7 @@ import RedirectToLogin from './RedirectToLogin';
 import MyTransactions from './Transaction/MyTransactions';
 import Message from './Message';
 import AcceptSplitOffer from './offer/AcceptSplitOffer';
+import ReputationTransaction from './Transaction/ReputationTransaction';
 
 function Body(props) {
   return (
@@ -41,6 +42,7 @@ function Body(props) {
       <Route exact path="/my-transactions" component={MyTransactions} />
       <Route exact path="/message/:receiverEmailId" component={Message} />
       <Route exact path="/accept-split-offer/:matchingOfferId/:splitOffer1/:splitOffer2/:aEqualsBPlusC" component={AcceptSplitOffer} />
+      <Route exact path="/reputationTransaction/:userId" component={ReputationTransaction} />
     </Switch>
   );
 }

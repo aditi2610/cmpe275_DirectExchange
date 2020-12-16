@@ -86,7 +86,9 @@ function BrowseOffers(props) {
               <Row>
                 <Col><b>User :</b> {offer.user && offer.user.nickName}</Col>
                 <Col><b>Reputation :</b>
+                <Link to={`/reputationTransaction/${offer.user && offer.user.id}`}>
                 <Rating rating={offer.user.rating} /> 
+                </Link>
                 </Col>
                 <Col></Col>
               </Row>

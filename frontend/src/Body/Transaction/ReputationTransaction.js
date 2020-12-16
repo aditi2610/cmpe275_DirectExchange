@@ -4,20 +4,20 @@ import { offerStatus, rooturl } from '../../config/config';
 import { Table, Container, Button } from 'react-bootstrap';
 
 import { Link } from 'react-router-dom';
-function MyTransactions(props) {
+function ReputationTransaction(props) {
   let [transactions, setTransactions] = React.useState([]);
   let [reload, setReload] = React.useState(false);
-
-  let handlePay = (transaction_id) => {
-    Axios.post(`${rooturl}/transactions/apply/${transaction_id}`, { validateStatus: false }).then(response => {
-      if (response.status === 200) {
-        setReload(!reload);
-      }
-    })
-  }
+  let userId = props.match.params.userId;
+//   let handlePay = (transaction_id) => {
+//     Axios.post(`${rooturl}/transactions/apply/${transaction_id}`, { validateStatus: false }).then(response => {
+//       if (response.status === 200) {
+//         setReload(!reload);
+//       }
+//     })
+//   }
 
   React.useEffect(() => {
-    Axios.get(`${rooturl}/transactions/${localStorage.getItem('userId')}`, { validateStatus: false }).then(response => {
+    Axios.get(`${rooturl}/transactions/${userId}`, { validateStatus: false }).then(response => {
       if (response.status === 200) {
         setTransactions(response.data);
       }
@@ -34,8 +34,8 @@ function MyTransactions(props) {
           <tr>
             <th>Amount</th>
             <th>Expiration Date</th>
-            <th>Action</th>
-            <th> Message User</th>
+            {/* <th>Action</th>
+            <th> Message User</th> */}
           </tr>
         </thead>
         <tbody>
@@ -43,11 +43,11 @@ function MyTransactions(props) {
             return <tr>
               <td>{transaction.sourceCurrency} {transaction.sendingAmount}</td>
               <td>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(transaction.expirationDate))}</td>
-              <td><Button onClick={e => handlePay(transaction.id)}>Pay Now</Button></td>
+              {/* <td><Button onClick={e => handlePay(transaction.id)}>Pay Now</Button></td>
               <td>
               {transaction.receiver && transaction.receiver.email ? <Link to={`/message/${transaction.receiver.email}`}><Button variant='primary'>Message</Button>
                 </Link>: ''}
-              </td>
+              </td> */}
             </tr>
           })}
         </tbody>
@@ -95,4 +95,4 @@ function MyTransactions(props) {
   );
 }
 
-export default MyTransactions;
+export default ReputationTransaction;
