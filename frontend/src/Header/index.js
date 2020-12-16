@@ -30,6 +30,9 @@ function Header(props) {
         <Nav.Item>
           <Nav.Link><Link to='/my-transactions'>My Transactions</Link></Nav.Link>
         </Nav.Item>
+        <Nav.Item>
+          <Nav.Link><Link to='/report'>Report</Link></Nav.Link>
+        </Nav.Item>
       </Nav>
       {localStorage.getItem('email') ? (
           <NavDropdown title={<FaUser/>} id="basic-nav-dropdown">
