@@ -10,6 +10,7 @@ function BrowseOffers(props) {
   let [offers, setOffers] = React.useState([]);
   let [loading, setLoading] = React.useState(true);
   let [currentPage,setCurrentPage] = React.useState(1);
+  let totalItems = 0;
   const handleOnChange = (e) => {
     const { form } = e.currentTarget;
     const queryData = {
@@ -35,6 +36,7 @@ function BrowseOffers(props) {
       if (response.status === 200) {
         console.log(response.data);
         setLoading(false);
+        totalItems = response.data.shift() || 0;
         setOffers(response.data);
       }
     })
@@ -115,7 +117,7 @@ function BrowseOffers(props) {
             <Pagination
               activePage={currentPage}
               itemsCountPerPage={10}
-              totalItemsCount={30}
+              totalItemsCount={totalItems >= 10 ? totalItems : 10}
               itemClass="page-item"
               linkClass="page-link"
               onChange={(e) => handlePageChange(e)}

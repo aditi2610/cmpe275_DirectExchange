@@ -6,6 +6,7 @@ import { rooturl } from '../../config/config';
 function CreateCounterOffer(props) {
   let parentOfferId = props.match.params.offerId;
   let matchingOfferId = props.match.params.matchingOfferId;
+  let splitMatchedUserId = props.match.params.splitMatchedUserId;
   let [responseMsg, setResponseMsg] = React.useState('');
 
   let handleSubmit = (e) => {
@@ -26,8 +27,15 @@ function CreateCounterOffer(props) {
     if(matchingOfferId){
       formData["hasMatchingOffer"] = "true";
       formData["matchingOffer"]  = {
-        "id" : matchingOfferId
+        "id" : parseInt(matchingOfferId)
       };
+    }
+    if(splitMatchedUserId){
+      formData["splitMatchedUser"] = {
+        "id" : parseInt(splitMatchedUserId)
+      }
+      formData["isSplitMatch"] = true;
+      formData["spitType"] = true;
     }
     console.log(formData);
     Axios.post(`${rooturl}/offer`, formData, { validateStatus: false })

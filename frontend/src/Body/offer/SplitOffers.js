@@ -26,7 +26,7 @@ function SplitOffers({offers,matchingOfferId, aEqualsBPlusC}) {
     })}
     <Card.Body>
     <Row>
-      <Col><Link to={`/accept-split-offer/${matchingOfferId}/${offers[0].id}/${offers[1].id}/${aEqualsBPlusC}`}><Button variant='primary'>Accept</Button></Link>{' '}<Link to={`/create-counter-offer/${offers[0].id}/${offers[0].id}`}><Button variant='primary'>Counter Offer</Button></Link>
+      <Col><Link to={`/accept-split-offer/${matchingOfferId}/${offers[0].id}/${offers[1].id}/${aEqualsBPlusC}`}><Button variant='primary'>Accept</Button></Link>{' '}<Link to={`/create-counter-offer/${(aEqualsBPlusC ? (offers[0].amount > offers[1].amount) : (offers[0].amount > offers[1].destinationAmount)) ? offers[0].id : offers[1].id}/${matchingOfferId}/${(aEqualsBPlusC ? (offers[0].amount > offers[1].amount) : (offers[0].amount > offers[1].destinationAmount)) ? offers[1].user.id : offers[0].user.id}`}><Button variant='primary'>Counter Offer</Button></Link>
       </Col>
     </Row>
     </Card.Body>

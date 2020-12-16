@@ -38,7 +38,8 @@ function Body(props) {
       <Route exact path="/browse-offers/:offerId/:email/accept" component={AcceptBrowseOffer} />
       <Route exact path="/create-counter-offer/:offerId" component={CreateCounterOffer} />
       <Route exact path="/create-counter-offer/:offerId/:matchingOfferId" component={CreateCounterOffer} />
-      <Route exact path="/create-counter-offer/:offerId/:email/accept" component={AcceptCounterOffer} />
+      <Route exact path="/create-counter-offer/:offerId/:matchingOfferId/:splitMatchedUserId" component={CreateCounterOffer} />
+      <Route exact path="/accept-counter-offer/:offerId/:email/accept" component={AcceptCounterOffer} />
       <Route exact path="/matching-offer/:myOfferId/:acceptedOfferId/accept" component={AcceptMatchingOffer} />
       <Route exact path="/my-transactions" component={MyTransactions} />
       <Route exact path="/message/:receiverEmailId" component={Message} />

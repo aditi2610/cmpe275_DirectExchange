@@ -83,7 +83,7 @@ function MatchingOffers(props) {
             </Row>
             <br />
             <Row>
-              <Col><Link to={`/create-counter-offer/${offer.id}/${offer.user && offer.user.email}/accept`}><Button variant='primary'>Accept</Button></Link></Col>
+              <Col><Link to={`/accept-counter-offer/${offer.id}/${offer.user && offer.user.email}/accept`}><Button variant='primary'>Accept</Button></Link></Col>
             </Row>
           </Card.Body>
         </Card>
