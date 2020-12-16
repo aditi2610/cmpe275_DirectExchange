@@ -341,29 +341,6 @@ public class OfferServiceImp implements IOfferService{
 		Offer offerC = offerCOptional.get();
 		double acceptSendingAmount = offerB.getAmount() * offerB.getExchangeRate() + offerC.getAmount() * offerC.getExchangeRate();
 		double acceptReceivingAmount = offerB.getAmount() * 0.95 + offerC.getAmount() * 0.95;
-//		Transactions t1 = new Transactions(
-//				acceptedOffer.getUser(),
-//				null, 
-//				acceptSendingAmount,
-//				acceptReceivingAmount,
-//				acceptedOffer.getSourceCurrency(),
-//				acceptedOffer.getDestinationCurrency(),
-//				acceptSendingAmount*0.05 ,
-//				acceptedOffer);
-//		t1.setExpirationDate(null);
-//		transactionsRepository.save(t1);
-//		saveTransaction(offerB,acceptedOffer);
-//		saveTransaction(offerC,acceptedOffer);
-//		deleteAllCounterOffer(acceptedOffer);
-//		deleteAllCounterOffer(offerB);
-//		deleteAllCounterOffer(offerC);
-//		offerB.setStatus(CommonConstants.OFFER_EXPIRED);
-//		offerC.setStatus(CommonConstants.OFFER_EXPIRED);
-//		acceptedOffer.setStatus(CommonConstants.OFFER_INTRANSACTION);
-//		acceptedOffer.setOfferAcceptor(offerB.getUser());
-//		offerRepository.save(acceptedOffer);
-//		offerRepository.save(offerB);
-//		offerRepository.save(offerC);
 		return doSPlitOffer(acceptSendingAmount, acceptReceivingAmount, acceptedOffer, offerB, offerC);
 	}
 	/*
@@ -396,7 +373,7 @@ public class OfferServiceImp implements IOfferService{
 	public boolean doSPlitOffer(double acceptSendingAmount,double acceptReceivingAmount,Offer acceptedOffer,Offer offerB, Offer offerC) throws Exception {
 		Transactions t1 = new Transactions(
 				acceptedOffer.getUser(),
-				null, 
+				offerB.getUser(), 
 				acceptSendingAmount,
 				acceptReceivingAmount,
 				acceptedOffer.getSourceCurrency(),
@@ -423,7 +400,7 @@ public class OfferServiceImp implements IOfferService{
 	public void saveTransaction(Offer currOffer,Offer acceptedOffer) {
 		Transactions t1 = new Transactions(
 				currOffer.getUser(),
-				null, 
+				acceptedOffer.getUser(), 
 				currOffer.getAmount(),
 				currOffer.getDestinationAmount()*0.95,
 				currOffer.getSourceCurrency(),
@@ -438,7 +415,7 @@ public class OfferServiceImp implements IOfferService{
 	public void saveTransaction(Offer acceptedOffer, User user) {
 		Transactions t1 = new Transactions(
 				acceptedOffer.getUser(),
-				user, 
+				user,
 				acceptedOffer.getAmount(),
 				acceptedOffer.getAmount()*0.95*acceptedOffer.getExchangeRate(),
 				acceptedOffer.getSourceCurrency(),
