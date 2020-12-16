@@ -91,7 +91,7 @@ public class UserController {
 		boolean isAuth = userService.verify(code);
 		String pageTitle = isAuth ? "verification Succeded": "Verification Failed";
 		System.out.println("Authenticaiton : "+ isAuth);
-		return res;
+		return new ResponseEntity<>("User Verified!",HttpStatus.OK);
 	}
 
 	@RequestMapping(value="user/login/oauth" , method = RequestMethod.POST)	

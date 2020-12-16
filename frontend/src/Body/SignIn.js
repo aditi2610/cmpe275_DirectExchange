@@ -122,7 +122,7 @@ function SignIn(props) {
                 </Button>
                 <br />
                 <h4 style={{ 'text-align': 'center' }}>OR</h4>
-                <OtherSignIn />
+                <OtherSignIn showUserLoginError={showUserLoginError} setShow={setShow}/>
               </Form>
             </Container>
           </Tab>

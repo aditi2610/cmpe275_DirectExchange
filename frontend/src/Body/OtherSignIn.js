@@ -16,9 +16,9 @@ firebase.initializeApp({
     authDomain: "directexchange-5db09.firebaseapp.com"
 })
 
-class OtherSignIn extends Component {
-    state = { isSignedIn: false }
-    uiConfig = {
+function OtherSignIn({showUserLoginError,setShow}) {
+    const { data, setData } = useDataContext();
+    const uiConfig = {
         signInFlow: "popup",
         signInOptions: [
             firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -28,12 +28,8 @@ class OtherSignIn extends Component {
             signInSuccess: () => false
         }
     }
-
-
-    componentDidMount = () => {
-
+    React.useEffect(() => {
         firebase.auth().onAuthStateChanged(user => {
-
             console.log("user", user)
             console.log(firebase.auth().currentUser.displayName, " displayName");
             const params = {
@@ -41,54 +37,31 @@ class OtherSignIn extends Component {
                 username: firebase.auth().currentUser.displayName
 
             }
-            // console.log("data going to add bank account" + JSON.stringify(params));
-            //set the with credentials to true
             axios.defaults.withCredentials = true;
-            axios.post(rooturl + '/user/login/oauth', null, { params })
+            axios.post(rooturl + '/user/login/oauth',null,{validateStatus: false, params: params })
                 .then(response => {
                     if (response.status === 200) {
                         localStorage.setItem("nickName", response.data.nickName);
                         localStorage.setItem("userId", response.data.id);
                         localStorage.setItem("email", params.email);
-                        const { data, setData } = useDataContext();
+                        setShow(false);
                         setData({ ...data, logggedIn: true });
-                        // this.setState({ isSignedIn: true });
-                        this.setState({ isSignedIn: !!user })
+                    }
+                    if(response.status === 401){
+                        showUserLoginError(<Alert variant="danger">{response.data['Bad Request']['Error Message']}</Alert>);
                     }
                 })
                 .catch(err => {
-                    this.setState({ errorMessage: "error" });
+                    
                 })
 
         })
-    }
-
-    render() {
-        return (
-            <div className="App">
-
-                {this.state.isSignedIn ? (
-                    <RedirectToHome />
-                    // <span>
-                    //     <div>Signed In!</div>
-                    //     <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
-                    //     <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
-                    //     <h1> {firebase.auth().currentUser.email}</h1>
-                    //     <img
-                    //         alt="profile picture"
-                    //         src={firebase.auth().currentUser.photoURL}
-                    //     />
-                    // </span>
-                ) : (
-                        <StyledFirebaseAuth
-                            uiConfig={this.uiConfig}
-                            firebaseAuth={firebase.auth()}
-                        />
-                    )}
-
-            </div>
-        )
-    }
+    },[]);
+    return (
+        <div className="App">
+            <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
+        </div>
+    )
 }
 
 export default OtherSignIn;

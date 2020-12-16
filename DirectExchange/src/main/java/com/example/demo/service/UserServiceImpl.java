@@ -179,7 +179,7 @@ public class UserServiceImpl implements IUserService {
 			String siteUrl = Utility.getSiteUrl(request);
 			String verificationCode = res.getBody().toString();
 			sendVerificationEmail(nickName, email,verificationCode, siteUrl);
-			return new ResponseEntity<>(user,HttpStatus.OK);
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", "User not yet verified " ),HttpStatus.UNAUTHORIZED);
 		}
 		else if(user!=null)
 		{
