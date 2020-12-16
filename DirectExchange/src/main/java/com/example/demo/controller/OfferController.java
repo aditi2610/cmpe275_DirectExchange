@@ -93,7 +93,7 @@ public class OfferController {
 			@PathParam("amount") Double amount,
 			@PathParam("destinationAmount") Double destinationAmount,
 			@PathParam("page") int page,@PathVariable("userId") Long userId){
-		List<Offer> newOffer;
+		List<Object> newOffer;
 		try {
 			newOffer = offerService.findAllWithFiltering(sourceCurrency, amount,destinationCurrency,destinationAmount, userId,page,10);
 			

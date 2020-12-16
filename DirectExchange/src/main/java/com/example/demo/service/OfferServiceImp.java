@@ -19,6 +19,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -126,7 +127,7 @@ public class OfferServiceImp implements IOfferService{
 	}
 	
 	@Override
-	public List<Offer> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount,long userId, int page, int size) throws Exception{
+	public List<Object> findAllWithFiltering(String sourceCurrency, Double amount, String destinationCurrency, Double destinationAmount,long userId, int page, int size) throws Exception{
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Offer> criteriaQuery = criteriaBuilder.createQuery(Offer.class);
 		Root<Offer> offerRoot = criteriaQuery.from(Offer.class);
@@ -160,9 +161,15 @@ public class OfferServiceImp implements IOfferService{
 		query.setFirstResult((page-1)*size);
 		query.setMaxResults(size);
 		List<Offer> items = query.getResultList();
+		List<Object> result = new ArrayList<>();
+		CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+		countQuery.select(criteriaBuilder.count(countQuery.from(Offer.class))).where(criteriaBuilder.and(predicateList.toArray(new Predicate[predicateList.size()])));
+		Long count = entityManager.createQuery(countQuery).getSingleResult();
 		//List<Offer> items =  entityManager.createQuery(criteriaQuery).getResultList();
-		//System.out.print(items);
-		return items;
+		System.out.println("   count   \n"+count+"\n\n");
+		result.add(count);
+		result.addAll(items);
+		return result;
 	}
 	
 	
