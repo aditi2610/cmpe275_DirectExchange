@@ -14,7 +14,7 @@ function SignIn(props) {
   const [userLoginError, showUserLoginError] = React.useState('');
   const [userRegisterError, showUserRegisterError] = React.useState('');
   const [closeModal, setCloseModal] = React.useState(null);
-  const {data,setData} = useDataContext();
+  const { data, setData } = useDataContext();
   axios.defaults.withCredentials = true;
 
   const handleClose = (e) => {
@@ -74,7 +74,7 @@ function SignIn(props) {
           localStorage.setItem("userId", response.data.id);
           localStorage.setItem("email", params.email);
           setShow(false);
-          setData({...data,logggedIn: true});
+          setData({ ...data, logggedIn: true });
         } else {
           let errors = Object.values(response.data || { 'error': ['Something went wrong'] });
           showUserLoginError(errors.map(error => {
@@ -93,7 +93,7 @@ function SignIn(props) {
   }
 
   return (
-    <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter">
+    <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" size="lg">
       <RedirectToHome />
       {closeModal}
       <Modal.Header closeButton>
@@ -120,9 +120,9 @@ function SignIn(props) {
                 <Button variant="primary" type="submit" block>
                   Sign In
                 </Button>
-                <br/>
-                <h4 style={{'text-align':'center'}}>OR</h4>
-                <OtherSignIn/>
+                <br />
+                <h4 style={{ 'text-align': 'center' }}>OR</h4>
+                <OtherSignIn />
               </Form>
             </Container>
           </Tab>
@@ -151,7 +151,10 @@ function SignIn(props) {
                 </Form.Group>
                 <Button variant="primary" type="submit" block>
                   Submit
-              </Button>
+                </Button>
+                {/* <br />
+                <h4 style={{ 'text-align': 'center' }}>OR</h4>
+                <OtherSignIn /> */}
               </Form>
             </Container>
           </Tab>
