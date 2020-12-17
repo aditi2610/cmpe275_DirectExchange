@@ -546,18 +546,14 @@ public class OfferServiceImp implements IOfferService{
 	private void checkForAEqualsBPlusC(double amount, List<Offer> forSplitMatch, List<List<Offer>> splitMathes) {
 		int size = forSplitMatch.size();
 		for(int i=0;i< size-1;i++) {
-			int j= size-1;
-			while(i<j) {
+			for(int j=1; j<size; j++) {
 				double sum = forSplitMatch.get(i).getAmount() + forSplitMatch.get(j).getAmount();
 				if(sum >= amount * 0.90 && sum <= amount * 1.10) {
 					List<Offer> temp= new ArrayList<>();
 					temp.add(forSplitMatch.get(i));
 					temp.add(forSplitMatch.get(j));
 					splitMathes.add(temp);
-				}else {
-					break;
 				}
-				j--;
 			}
 		}		
 	}
