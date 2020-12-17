@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Common.CommonUtilities;
+import com.example.demo.controller.Utility;
 import com.example.demo.dao.TransactionsRepository;
 import com.example.demo.dao.UserRepository;
 import com.example.demo.dto.Transactions;
@@ -92,6 +94,9 @@ public class UserServiceImpl implements IUserService {
 		
 	}
 	
+	
+	
+	
 	@Override
 	public boolean verify(String verificationCode) {
 		System.out.println("INside verify Method");
@@ -157,6 +162,41 @@ public class UserServiceImpl implements IUserService {
 			userRepository.save(userActual);
 
 		}
+		
+	}
+	
+	
+	@Override
+	public ResponseEntity<?> loginUsingOAuth(String email, String nickName, HttpServletRequest request) throws InvalidRequestException, UnsupportedEncodingException, MessagingException {
+		// TODO Auto-generated method stub
+		
+		User user=userRepository.findByEmail(email);
+		System.out.println(user);
+		
+		if(user == null) {
+			
+			ResponseEntity<?> res =addUser(nickName, email, "");
+			String siteUrl = Utility.getSiteUrl(request);
+			String verificationCode = res.getBody().toString();
+			sendVerificationEmail(nickName, email,verificationCode, siteUrl);
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", "User not yet verified " ),HttpStatus.UNAUTHORIZED);
+		}
+		else if(user!=null)
+		{
+			if(user.getIsVerified())
+		{
+			return new ResponseEntity<>(user,HttpStatus.OK);
+		}
+		else
+		{
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", "User not yet verified " ),HttpStatus.UNAUTHORIZED);
+		}
+		}
+		else
+		{
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "404", "INVALID CREDENTIALS " ),HttpStatus.NOT_FOUND);
+		}
+		
 		
 	}
 	

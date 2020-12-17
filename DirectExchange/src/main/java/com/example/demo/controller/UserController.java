@@ -29,32 +29,32 @@ import com.example.demo.service.IUserService;
 @CrossOrigin
 @RestController
 public class UserController {
-	
+
 	@Autowired
 	private IUserService userService;
-	
+
 	//Adding New User
 	@RequestMapping(value="user/register" , method = RequestMethod.POST)	
 	public ResponseEntity<?> addUser(
 			@RequestParam(value="nickName",required=false) String nickName,
 			@RequestParam(value="email",required=false) String email,
 			@RequestParam(value="password",required=false) String password, HttpServletRequest request)
-			throws UnsupportedEncodingException, MessagingException
+					throws UnsupportedEncodingException, MessagingException
 	{ 
 
 		ResponseEntity<?> res = null;
 		try {
-	System.out.println(nickName);
+			System.out.println(nickName);
 			res = userService.addUser(nickName, email, password);
-			
-		 	if(res.getStatusCode()==HttpStatus.OK) {
-		 		System.out.println("user created no issues");
-		 		String siteUrl = Utility.getSiteUrl(request);
+
+			if(res.getStatusCode()==HttpStatus.OK) {
+				System.out.println("user created no issues");
+				String siteUrl = Utility.getSiteUrl(request);
 				String verificationCode = res.getBody().toString();
-			 	userService.sendVerificationEmail(nickName, email,verificationCode, siteUrl);	
-			 	res = new ResponseEntity<>(HttpStatus.CREATED);
-		 	}
-		 	
+				userService.sendVerificationEmail(nickName, email,verificationCode, siteUrl);	
+				res = new ResponseEntity<>(HttpStatus.CREATED);
+			}
+
 		} catch (InvalidRequestException e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
@@ -62,28 +62,28 @@ public class UserController {
 		return res;
 	}
 
-	
-	//User Login
-	
-		@RequestMapping(value="user/login" , method = RequestMethod.POST)	
-		public ResponseEntity<?> loginUser(
-				@RequestParam(value="email",required=false) String email,
-				@RequestParam(value="password",required=false) String password,
-				HttpSession session)		
-		{ 
-			ResponseEntity<?> res = null;
-			try {
-		System.out.println(email+" "+password);
-				res = userService.loginUser(email, password,session);
-			
-			} catch (InvalidRequestException e) {
-				e.printStackTrace();
-				return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
-			}
-			return res;
-		}
 
-			@RequestMapping(value="verify/{code}" , method = RequestMethod.GET)	
+	//User Login
+
+	@RequestMapping(value="user/login" , method = RequestMethod.POST)	
+	public ResponseEntity<?> loginUser(
+			@RequestParam(value="email",required=false) String email,
+			@RequestParam(value="password",required=false) String password,
+			HttpSession session)		
+	{ 
+		ResponseEntity<?> res = null;
+		try {
+			System.out.println(email+" "+password);
+			res = userService.loginUser(email, password,session);
+
+		} catch (InvalidRequestException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
+		return res;
+	}
+
+	@RequestMapping(value="verify/{code}" , method = RequestMethod.GET)	
 	public ResponseEntity<?> verifyUser(@PathVariable("code") String code)
 	{ 
 		System.out.println("Inside Verfiy Controller");
@@ -91,6 +91,24 @@ public class UserController {
 		boolean isAuth = userService.verify(code);
 		String pageTitle = isAuth ? "verification Succeded": "Verification Failed";
 		System.out.println("Authenticaiton : "+ isAuth);
+		return new ResponseEntity<>("User Verified!",HttpStatus.OK);
+	}
+
+	@RequestMapping(value="user/login/oauth" , method = RequestMethod.POST)	
+	public ResponseEntity<?> loginUserOauth(
+			@RequestParam(value="email",required=false) String email,
+			@RequestParam(value="username",required=false) String username,
+			HttpServletRequest request) throws UnsupportedEncodingException, MessagingException		
+	{ 
+		ResponseEntity<?> res = null;
+		try {
+			System.out.println(email+" "+username);
+			res = userService.loginUsingOAuth( email, username, request);
+
+		} catch (InvalidRequestException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(CommonUtilities.getErrorMessage("Bad Request", "400", e.getMessage()) ,HttpStatus.BAD_REQUEST);
+		}
 		return res;
 	}
 }

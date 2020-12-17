@@ -3,11 +3,11 @@ package com.example.demo.service;
 import java.io.UnsupportedEncodingException;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.http.ResponseEntity;
 
-import com.example.demo.dto.User;
 import com.example.demo.exception.InvalidRequestException;
 
 public interface IUserService {
@@ -21,4 +21,5 @@ public interface IUserService {
 	void sendVerificationEmail(String nickName, String email, String verificationCode, String siteUrl)throws UnsupportedEncodingException, MessagingException;
 	
 	void setUserReputation(Long id);
+	ResponseEntity<?> loginUsingOAuth(String email, String nickName, HttpServletRequest req) throws InvalidRequestException, UnsupportedEncodingException, MessagingException;
 }

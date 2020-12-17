@@ -1,5 +1,13 @@
 import React, { Component } from "react"
 
+import { Modal, Container, Row, Col, Button, Tabs, Tab, Form, Alert } from 'react-bootstrap';
+import RedirectToHome from './RedirectToHome';
+import { Redirect } from 'react-router-dom';
+import { useDataContext } from './../App';
+import axios from 'axios';
+import { rooturl } from '../config/config';
+import { Link } from 'react-router-dom';
+
 import firebase from "firebase"
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 
@@ -8,9 +16,9 @@ firebase.initializeApp({
     authDomain: "directexchange-5db09.firebaseapp.com"
 })
 
-class OtherSignIn extends Component {
-    state = { isSignedIn: false }
-    uiConfig = {
+function OtherSignIn({showUserLoginError,setShow}) {
+    const { data, setData } = useDataContext();
+    const uiConfig = {
         signInFlow: "popup",
         signInOptions: [
             firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -20,38 +28,40 @@ class OtherSignIn extends Component {
             signInSuccess: () => false
         }
     }
-
-    componentDidMount = () => {
-
+    React.useEffect(() => {
         firebase.auth().onAuthStateChanged(user => {
-            this.setState({ isSignedIn: !!user })
             console.log("user", user)
-        })
-    }
+            console.log(firebase.auth().currentUser.displayName, " displayName");
+            const params = {
+                email: firebase.auth().currentUser.email,
+                username: firebase.auth().currentUser.displayName
 
-    render() {
-        return (
-            <div className="App">
-                {this.state.isSignedIn ? (
-                    <span>
-                        <div>Signed In!</div>
-                        <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
-                        <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
-                        <h1> {firebase.auth().currentUser.email}</h1>
-                        <img
-                            alt="profile picture"
-                            src={firebase.auth().currentUser.photoURL}
-                        />
-                    </span>
-                ) : (
-                        <StyledFirebaseAuth
-                            uiConfig={this.uiConfig}
-                            firebaseAuth={firebase.auth()}
-                        />
-                    )}
-            </div>
-        )
-    }
+            }
+            axios.defaults.withCredentials = true;
+            axios.post(rooturl + '/user/login/oauth',null,{validateStatus: false, params: params })
+                .then(response => {
+                    if (response.status === 200) {
+                        localStorage.setItem("nickName", response.data.nickName);
+                        localStorage.setItem("userId", response.data.id);
+                        localStorage.setItem("email", params.email);
+                        setShow(false);
+                        setData({ ...data, logggedIn: true });
+                    }
+                    if(response.status === 401){
+                        showUserLoginError(<Alert variant="danger">{response.data['Bad Request']['Error Message']}</Alert>);
+                    }
+                })
+                .catch(err => {
+                    
+                })
+
+        })
+    },[]);
+    return (
+        <div className="App">
+            <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
+        </div>
+    )
 }
 
 export default OtherSignIn;
