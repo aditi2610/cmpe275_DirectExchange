@@ -74,11 +74,11 @@ public class TransactionsServiceImp implements ITransactionsService {
 		List<Object[]> pendingTransactions = transactionsRepository.generatePendingTransactionReport();
 		List<Result> list = new ArrayList<>();
 		for(Object[]  object: transOptional) {
-			Result r = new Result((Double)object[0], (Double)object[1], ((Number)object[2]).longValue(), (Integer)object[3] );
+			Result r = new Result(object[0]== null ? 0:(Double)object[0],object[1]== null ? 0: (Double)object[1], object[2]== null ? 0:((Number)object[2]).longValue(), object[3]== null ? 1:(Integer)object[3] );
 			list.add(r);
 		}
 		for(Object[] ob: pendingTransactions) {
-			Result r = new Result((Double)ob[0], (Double)ob[1], ((Number)ob[2]).longValue(), (Integer)ob[3] );
+			Result r = new Result(ob[0] == null ? 0: (Double)ob[0], ob[1]== null ? 0: (Double)ob[1],ob[2]== null ? 0: ((Number)ob[2]).longValue(),ob[3]== null ? 0: (Integer)ob[3] );
 			list.add(r);
 		}
 //		System.out.println("lets see");
