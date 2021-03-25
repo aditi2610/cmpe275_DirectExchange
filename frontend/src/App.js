@@ -1,4 +1,4 @@
-import {BrowserRouter as Router} from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Header from './Header/index.js';
@@ -7,7 +7,8 @@ import React from 'react';
 export const DataContext = React.createContext({});
 export const useDataContext = () => React.useContext(DataContext);
 
-const initialState = {logggedIn : false,
+const initialState = {
+  logggedIn: false,
 }
 
 function App() {
@@ -17,10 +18,10 @@ function App() {
       <div className="App">
         <div className="App">
           <Router>
-            <Header/>
-            <br/>
-            <br/>
-            <Body/>
+            <Header />
+            <br />
+            <br />
+            <Body />
           </Router>
         </div>
       </div>

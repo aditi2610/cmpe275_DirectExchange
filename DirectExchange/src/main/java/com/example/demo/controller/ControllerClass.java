@@ -44,7 +44,7 @@ public ResponseEntity<?> addBankAccount(
 
 	ResponseEntity<?> res = null;
 	try {
-System.out.println(bankName+" "+"country "+country+accountNumber+ownerName+ownerAddress+primaryCurrency+supportMethod+userId);
+	System.out.println(bankName+" "+"country "+country+accountNumber+ownerName+ownerAddress+primaryCurrency+supportMethod+userId);
 		res = BankAccountService.addBankAccount(bankName, country, accountNumber, ownerName, ownerAddress,  primaryCurrency,supportMethod, userId);
 	} catch (Exception e) {
 		e.printStackTrace();
