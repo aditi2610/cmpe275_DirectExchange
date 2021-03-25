@@ -12,7 +12,6 @@ import com.example.demo.dao.CurrencyRatesRepository;
 import com.example.demo.dto.CurrencyRates;
 import com.example.demo.exception.InvalidRequestException;
 
-
 @Service
 public class ExchangeRateServiceImpl implements IExchangeRateService {
 

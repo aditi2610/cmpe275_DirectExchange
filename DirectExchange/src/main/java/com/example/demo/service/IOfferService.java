@@ -10,10 +10,8 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.Offer;
 import com.example.demo.dto.User;
 import com.example.demo.exception.InvalidRequestException;
-
 @Service
 public interface IOfferService {
-
 	public Offer add(Offer offer) throws Exception;
 
 	public Offer update(Offer offer) throws Exception;

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.dto.Report;
 import com.example.demo.dto.Result;
 import com.example.demo.dto.Transactions;
-
 @Service
 public interface ITransactionsService {
 
